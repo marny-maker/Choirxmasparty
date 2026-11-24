@@ -8,6 +8,13 @@
 <meta property="og:title" content="Deck the Dates: Christmas Party 2026">
 <meta property="og:description" content="Argao Minstrels, El Voicetas and Cantores Dei: pick your nights, pick a venue, request a song.">
 <meta property="og:type" content="website">
+<!-- Link preview image (og-thumbnail.png sits next to this file). Once Vercel gives you the site link,
+     change the content below to the full address, e.g. https://your-site.vercel.app/og-thumbnail.png -->
+<meta property="og:image" content="/og-thumbnail.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Deck the Dates: Christmas Party 2026 for Argao Minstrels, El Voicetas and Cantores Dei">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#10173A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310173A'/%3E%3Cellipse cx='25' cy='45' rx='10' ry='7.5' transform='rotate(-22 25 45)' fill='%23F4B740'/%3E%3Cpath d='M33.5 43V12c6 3 13 6 13 15' stroke='%23F4B740' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,6 +36,9 @@ html{background:var(--night);color:var(--capiz);-webkit-text-size-adjust:100%}
 body{margin:0;font:400 17px/1.55 var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;
   background:radial-gradient(1100px 620px at 50% -12%,rgba(244,183,64,.17),transparent 62%),var(--night)}
 img{max-width:100%;display:block}
+/* long pasted text (links, names without spaces) wraps instead of widening the page on phones */
+main,footer,.toast,.lb-cap{overflow-wrap:anywhere}
+.chip{max-width:100%;text-align:left}
 a{color:var(--gold);text-underline-offset:3px}
 button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 :focus-visible{outline:2.5px solid var(--gold);outline-offset:3px}
@@ -105,6 +115,7 @@ textarea.input{font-size:17px;min-height:88px;resize:vertical;line-height:1.45}
 .chipgroup{margin-top:12px}
 .chipgroup h4{margin:0 0 7px;font:italic 400 17px/1 var(--serif);color:var(--capiz)}
 .cbreak{display:block;font-size:14px;color:var(--capiz-2);margin-top:3px}
+.nw{white-space:nowrap}
 .roll .pl{font:700 11px/1 var(--sans);color:var(--c);margin-left:3px}
 .parts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
 .part{background:var(--night-2);border:1.5px solid var(--line);border-radius:12px;padding:12px 2px 10px;text-align:center;transition:background-color .15s,border-color .15s,transform .1s}
@@ -185,6 +196,8 @@ textarea.input{font-size:17px;min-height:88px;resize:vertical;line-height:1.45}
 .amen{font-size:15px;color:var(--capiz-2);margin:0}
 .amen b{color:var(--capiz);font-weight:600}
 .vnote{font-size:14.5px;color:var(--gold);margin:0}
+.quip{margin:0;font:italic 400 18px/1.35 var(--serif);color:var(--capiz);border-left:3px solid var(--gold);padding:2px 0 2px 12px}
+.quip .by{display:block;font:500 12.5px/1.3 var(--sans);color:var(--capiz-3);margin-top:4px}
 .vlinks{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14.5px}
 .credit{font-size:12.5px;color:var(--capiz-3);margin:0}
 .pick{margin-top:auto;width:100%}
@@ -466,7 +479,7 @@ const DATES = [
 ];
 
 /* Venues. avail per night: true = available, false = not available, null = still asking.
-   When Sea Breeze / Bulasa reply: set avail, status:"ok", fill rates, and remove the asking note. */
+   When a venue replies: set avail, status:"ok", fill rates, and remove the asking note. */
 const VENUES = [
   {
     id: "commune", name: "Commune Argao", short: "Commune",
@@ -516,12 +529,13 @@ const VENUES = [
   {
     id: "seabreeze", name: "Sea Breeze Beachfront Villa", short: "Sea Breeze",
     kind: "Two-storey beachfront villa on Rizal St., near the Argao church",
-    avail: { d26: null, d27: null, d28: null }, status: "ok",
-    rates: ["Whole house: \u20b112,000"],
-    amenities: "sea view right on the water, sleeps up to 16 (2 king, 2 queen, 3 bunk beds), full kitchen, air-conditioning, Wi-Fi, free parking, renovated in 2024",
-    note: "Still asking which nights are free.",
-    cost: function () { return 12000; },
-    costNote: "\u20b112,000 for the whole house",
+    avail: { d26: false, d27: true, d28: false }, status: "ok",
+    rates: ["Whole house: \u20b115,000", "No pool and no videoke"],
+    amenities: "sea view right on the water, a big open yard, sleeps up to 16 (2 king, 2 queen, 3 bunk beds), full kitchen, air-conditioning, Wi-Fi, free parking, renovated in 2024",
+    note: "",
+    quip: { text: "Dakog hawan pero ambot matug ra siguro ta diri? Haha", by: "MJ's scouting report" },
+    cost: function () { return 15000; },
+    costNote: "\u20b115,000 for the whole house",
     photos: [
       { src: "https://images.trvl-media.com/lodging/107000000/106500000/106493200/106493166/c22825aa.jpg?impolicy=fcrop&w=1200&h=900", cap: "Beachfront lawn and patio" },
       { src: "https://images.trvl-media.com/lodging/107000000/106500000/106493200/106493166/6a2e2c11.jpg?impolicy=fcrop&w=1200&h=900", cap: "The view from the seawall" },
@@ -893,6 +907,7 @@ function renderVenues() {
       const rates = v.rates.length ? `<ul class="facts">${v.rates.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : "";
       const amen = v.amenities ? `<p class="amen"><b>What's there:</b> ${esc(v.amenities)}.</p>` : "";
       const note = v.note ? `<p class="vnote">${esc(v.note)}</p>` : "";
+      const quip = v.quip ? `<p class="quip">\u201c${esc(v.quip.text)}\u201d<span class="by">${esc(v.quip.by)}</span></p>` : "";
       const links = v.links.map(l => `<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("");
       return `<article class="venue" id="venue-${v.id}" data-venue="${v.id}">
         <div class="carousel">
@@ -905,7 +920,7 @@ function renderVenues() {
           <div class="vtop"><div><h3>${esc(v.name)}</h3><p class="kind">${esc(v.kind)}</p></div>
             <span class="status ${v.status === "ok" ? "ok" : "ask"}">${v.status === "ok" ? "Rates in" : "Still asking"}</span></div>
           <div class="avail" aria-label="Availability by night">${av}</div>
-          ${rates}${amen}${note}
+          ${rates}${amen}${note}${quip}
           <div class="vlinks">${links}</div>
           <p class="credit">${esc(v.credit)}</p>
           <button type="button" class="btn pick" aria-pressed="false" data-pick="${v.id}"><span class="ck" aria-hidden="true">♫ </span>I'd go here</button>
@@ -1195,7 +1210,7 @@ function renderRoll() {
   const groups = CHOIRS.map(c => [c.name, S.votes.filter(v => v.choir === c.id && !v.cant_make_it)]);
   groups.push(["No choir picked", S.votes.filter(v => !choirById(v.choir) && !v.cant_make_it)]);
   const resting = S.votes.filter(v => v.cant_make_it);
-  const person = v => { const p = PARTS[v.voice_part] || PARTS.X; return `${esc(v.name)}<span class="pl" style="--c:${p.css}" title="${p.name}">${v.voice_part && v.voice_part !== "X" ? v.voice_part : ""}</span> <span style="color:var(--capiz-3)">${(v.dates || []).map(id => dateById(id).label.replace("Dec ", "")).join(", ")}</span>`; };
+  const person = v => { const p = PARTS[v.voice_part] || PARTS.X; return `${esc(v.name)}<span class="pl" style="--c:${p.css}" title="${p.name}">${v.voice_part && v.voice_part !== "X" ? v.voice_part : ""}</span> <span style="color:var(--capiz-3)">${(v.dates || []).map(id => `<span class="nw">${dateById(id).label.replace("Dec ", "")}</span>`).join(", ")}</span>`; };
   let h = groups.filter(g => g[1].length).map(g => `<section style="--c:var(--gold)"><h4>${esc(g[0])} (${g[1].length})</h4><p>${g[1].slice().sort((a, b) => order(a) - order(b) || a.name.localeCompare(b.name)).map(person).join("; ")}</p></section>`).join("");
   if (resting.length) h += `<section style="--c:var(--capiz-3)"><h4>Resting this one (${resting.length})</h4><p>${resting.map(v => esc(v.name) + (choirById(v.choir) ? ` <span style="color:var(--capiz-3)">(${choirById(v.choir).short})</span>` : "")).join(", ")}</p></section>`;
   $("#roll").innerHTML = h || `<p class="subp">Names appear here as people vote.</p>`;
@@ -1298,7 +1313,8 @@ async function save() {
     Sound.joy(); flyNotes(btn);
     toast(row.cant_make_it ? "Vote saved. We'll miss you!" : "Vote saved. See where everyone stands below.");
     await refresh(false);
-    setTimeout(() => $("#results").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }), 1100);
+    clearTimeout(S.scrollT);   // show the results, unless the person starts doing something else first
+    S.scrollT = setTimeout(() => { S.scrollT = 0; $("#results").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }); }, 1100);
   } catch (e) {
     $("#saveErr").textContent = e.missingTable ? "The voting table isn't set up yet, so this couldn't be saved. Let " + CONFIG.ORGANIZER + " know." : "Couldn't save just now. Check your connection and tap save again.";
   } finally {
@@ -1317,6 +1333,9 @@ function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.ad
    ================================================================ */
 function wire() {
   document.addEventListener("pointerdown", () => Sound.unlock(), { once: true });
+  ["pointerdown", "keydown", "wheel", "touchmove"].forEach(ev => window.addEventListener(ev, function () {
+    if (S.scrollT) { clearTimeout(S.scrollT); S.scrollT = 0; }
+  }, { passive: true, capture: true }));
 
   $("#soundBtn").addEventListener("click", function () {
     const v = !Sound.on; Sound.set(v);
