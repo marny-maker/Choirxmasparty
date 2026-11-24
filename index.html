@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Deck the Dates: Choir Christmas Party 2026</title>
-<meta name="description" content="Tell the choir which nights you are free (Dec 26 to 29) and which venue you like. Results update live.">
-<meta property="og:title" content="Deck the Dates: Choir Christmas Party 2026">
-<meta property="og:description" content="Pick your nights, pick a venue, request a song. Vote takes a minute.">
+<title>Deck the Dates: Christmas Party 2026</title>
+<meta name="description" content="Argao Minstrels, El Voicetas and Cantores Dei: tell us which nights you are free (Dec 26 to 29) and which venue you like. Results update live.">
+<meta property="og:title" content="Deck the Dates: Christmas Party 2026">
+<meta property="og:description" content="Argao Minstrels, El Voicetas and Cantores Dei: pick your nights, pick a venue, request a song.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#10173A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310173A'/%3E%3Cellipse cx='25' cy='45' rx='10' ry='7.5' transform='rotate(-22 25 45)' fill='%23F4B740'/%3E%3Cpath d='M33.5 43V12c6 3 13 6 13 15' stroke='%23F4B740' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -56,6 +56,7 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 /* hero */
 .hero{text-align:center;padding:52px 20px 10px;max-width:920px;margin:0 auto}
 .hero h1{font:400 clamp(3.7rem,16.5vw,7.6rem)/.9 var(--serif);margin:0;letter-spacing:-.012em}
+.hero .trio{font:400 clamp(1.15rem,4.4vw,1.45rem)/1.3 var(--serif);color:var(--capiz);margin:6px auto 0;max-width:30em;text-wrap:balance}
 .hero .sub{font:italic 400 clamp(1.3rem,4.8vw,1.7rem)/1.2 var(--serif);color:var(--gold);margin:16px 0 0}
 .hero-staff{width:min(660px,100%);height:auto;margin:22px auto 4px;display:block;overflow:visible}
 .hero-staff .sl{stroke:var(--capiz-3);stroke-width:1.1}
@@ -96,6 +97,15 @@ textarea.input{font-size:17px;min-height:88px;resize:vertical;line-height:1.45}
 .hint{font-size:14.5px;color:var(--capiz-2);margin:8px 0 0;min-height:1.3em}
 .hint.gold{color:var(--gold)}
 
+.choirpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 22px}
+.choir{background:var(--night-2);border:1.5px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center;font:400 19px/1.15 var(--serif);transition:background-color .15s,border-color .15s,transform .1s}
+.choir:hover{border-color:var(--line-2)}
+.choir[aria-checked="true"]{background:var(--capiz);border-color:var(--capiz);color:#19142E}
+.choir:active{transform:scale(.97)}
+.chipgroup{margin-top:12px}
+.chipgroup h4{margin:0 0 7px;font:italic 400 17px/1 var(--serif);color:var(--capiz)}
+.cbreak{display:block;font-size:14px;color:var(--capiz-2);margin-top:3px}
+.roll .pl{font:700 11px/1 var(--sans);color:var(--c);margin-left:3px}
 .parts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
 .part{background:var(--night-2);border:1.5px solid var(--line);border-radius:12px;padding:12px 2px 10px;text-align:center;transition:background-color .15s,border-color .15s,transform .1s}
 .part .L{display:block;font:400 32px/1 var(--serif)}
@@ -294,7 +304,8 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
 <main id="top">
   <section class="hero" aria-labelledby="title">
     <h1 id="title">Deck the Dates</h1>
-    <p class="sub" id="subtitle">Choir Christmas Party 2026</p>
+    <p class="sub">Christmas Party 2026</p>
+    <p class="trio" id="trio"></p>
     <svg class="hero-staff" id="heroStaff" viewBox="0 0 660 132" role="img" aria-label="The opening notes of Joy to the World"></svg>
     <p class="intro">Pick the nights you can make it between Dec 26 and 29, tell us which venue you like, and request a song. Everyone's answers show up live at the bottom of the page.</p>
     <div id="deadline"></div>
@@ -311,18 +322,20 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       <div class="step-head">
         <span class="mark" aria-hidden="true">A</span>
         <div><p class="tempo">Andante</p><h2 id="h-a">Who's singing?</h2>
-        <p class="lede">Your name and voice part. Tap a part to hear its pitch pipe.</p></div>
+        <p class="lede">Your name, your choir and your voice part. Tap a part to hear its pitch pipe.</p></div>
       </div>
       <div class="field">
         <label for="nameInput">Your name, the way the choir knows you</label>
         <input class="input" id="nameInput" type="text" maxlength="40" autocomplete="nickname" autocapitalize="words" placeholder="e.g. MJ" enterkeyhint="next">
         <p class="hint" id="nameHint" aria-live="polite"></p>
       </div>
+      <p class="flabel" id="choirLbl">Your choir</p>
+      <div class="choirpick" id="choirs" role="radiogroup" aria-labelledby="choirLbl"></div>
       <p class="flabel" id="partLbl">Voice part</p>
       <div class="parts" id="parts" role="radiogroup" aria-labelledby="partLbl"></div>
       <div class="voters" id="voters" hidden>
         <p>Already voted? Tap your name to change your answers.</p>
-        <div class="chips" id="voterChips"></div>
+        <div id="voterChips"></div>
       </div>
     </div>
   </section>
@@ -432,11 +445,18 @@ const CONFIG = {
   SUPABASE_URL: "https://auhkazxubjczgcusamxq.supabase.co",
   SUPABASE_KEY: "sb_publishable_boKVP7k36iEFYikPRz3spA_d196OI1i",
   TABLE: "choir_xmas_votes",
-  CHOIR_NAME: "",          // e.g. "CTU-Argao Chorale". Blank shows "Choir Christmas Party 2026"
   ORGANIZER: "MJ",         // shown in the footer
   VOTING_DEADLINE: "",     // e.g. "Sunday, Dec 7". Blank hides the deadline pill
   POLL_MS: 12000
 };
+
+/* The three choirs. The ids are saved with each vote, so don't change them once voting starts. */
+const CHOIRS = [
+  { id: "minstrels", name: "Argao Minstrels", short: "Minstrels", arp: [60, 64, 67, 72] },
+  { id: "voicetas",  name: "El Voicetas",     short: "Voicetas",  arp: [64, 68, 71, 76] },
+  { id: "cantores",  name: "Cantores Dei",    short: "Cantores",  arp: [67, 71, 74, 79] }
+];
+const choirById = id => CHOIRS.find(c => c.id === id);
 
 /* Party nights. "chord" = the carol chord this night sings in the score (MIDI pitch classes). */
 const DATES = [
@@ -475,7 +495,7 @@ const VENUES = [
     id: "elkapitan", name: "El Kapitan Resort", short: "El Kapitan",
     kind: "Resort with pools and sports courts in Bulasa, Argao",
     avail: { d26: true, d27: true, d28: true }, status: "ok",
-    rates: ["Entrance: ₱250 per person, includes pool and amenities", "Function hall: ₱2,500, videoke included", "Pickleball: ₱50 per hour (4 courts)", "Tennis court, and a free volleyball area (bring your own ball)", "50% deposit to reserve"],
+    rates: ["Entrance: ₱250 per person, includes pool and amenities", "Function hall: ₱2,500, videoke included", "Pickleball (4 courts): ₱200 per hour with our entrance, instead of the regular ₱250", "Tennis court, and a free volleyball area (bring your own ball)", "50% deposit to reserve"],
     amenities: "",
     note: "Still confirming: overnight rooms and their rates.",
     cost: function (a, k) { return 250 * (a + k) + 2500; },
@@ -496,11 +516,12 @@ const VENUES = [
   {
     id: "seabreeze", name: "Sea Breeze Beachfront Villa", short: "Sea Breeze",
     kind: "Two-storey beachfront villa on Rizal St., near the Argao church",
-    avail: { d26: null, d27: null, d28: null }, status: "ask",
-    rates: [],
+    avail: { d26: null, d27: null, d28: null }, status: "ok",
+    rates: ["Whole house: \u20b112,000"],
     amenities: "sea view right on the water, sleeps up to 16 (2 king, 2 queen, 3 bunk beds), full kitchen, air-conditioning, Wi-Fi, free parking, renovated in 2024",
-    note: "Still asking about rates and which nights are free.",
-    cost: null,
+    note: "Still asking which nights are free.",
+    cost: function () { return 12000; },
+    costNote: "\u20b112,000 for the whole house",
     photos: [
       { src: "https://images.trvl-media.com/lodging/107000000/106500000/106493200/106493166/c22825aa.jpg?impolicy=fcrop&w=1200&h=900", cap: "Beachfront lawn and patio" },
       { src: "https://images.trvl-media.com/lodging/107000000/106500000/106493200/106493166/6a2e2c11.jpg?impolicy=fcrop&w=1200&h=900", cap: "The view from the seawall" },
@@ -518,10 +539,10 @@ const VENUES = [
   {
     id: "bulasa", name: "Bulasa Mangroves Beach Resort", short: "Bulasa Mangroves",
     kind: "Beach resort shaded by mangroves, in Bulasa, Argao",
-    avail: { d26: null, d27: null, d28: null }, status: "ok",
+    avail: { d26: true, d27: true, d28: true }, status: "ok",
     rates: ["Entrance: \u20b1250 per person, overnight, pool open until 10 PM", "Videoke: \u20b1150 per hour", "Overnight cottage: \u20b11,000", "Rooms: Deluxe (for 2) and Family (for 8) are their suggested setup, with free breakfast, no limit", "Extra bed: \u20b1500", "50% deposit to book"],
     amenities: "swimming pool, a shoreline under old mangrove trees, hammocks, cottages along the pool, beachfront grounds",
-    note: "Still confirming: room rates and which nights are open.",
+    note: "Still confirming: room rates.",
     cost: function (a, k) { return 250 * (a + k) + 1000; },
     costNote: "\u20b1250 entrance each plus one \u20b11,000 overnight cottage (rooms not included yet)",
     photos: [
@@ -562,7 +583,8 @@ const store = {
   del(k) { try { localStorage.removeItem(k); } catch (e) {} }
 };
 const normName = s => String(s || "").trim().replace(/\s+/g, " ");
-const keyOf = s => normName(s).toLowerCase();
+const nameLower = s => normName(s).toLowerCase();
+const voteKey = (name, choir) => (choir || "none") + "|" + nameLower(name);   // same name in two choirs = two people
 const peso = n => "₱" + Math.round(n).toLocaleString("en-PH");
 const reduced = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function hash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -744,7 +766,7 @@ const API = (function () {
 /* ================================================================
    State
    ================================================================ */
-const blankDraft = () => ({ name: "", part: "", dates: [], none: false, venues: [], adults: 0, kids: 0, song: "", note: "" });
+const blankDraft = () => ({ name: "", choir: "", part: "", dates: [], none: false, venues: [], adults: 0, kids: 0, song: "", note: "" });
 const S = {
   votes: [], loaded: false, error: null,
   draft: (function () { try { return Object.assign(blankDraft(), JSON.parse(store.get("dtd_draft", "{}"))); } catch (e) { return blankDraft(); } })(),
@@ -756,7 +778,7 @@ const voteByKey = k => S.votes.find(v => v.name_key === k);
 
 function loadVoteIntoDraft(v) {
   S.draft = {
-    name: v.name, part: v.voice_part || "", dates: (v.dates || []).slice(), none: !!v.cant_make_it,
+    name: v.name, choir: v.choir || "", part: v.voice_part || "", dates: (v.dates || []).slice(), none: !!v.cant_make_it,
     venues: (v.venues || []).slice(), adults: v.guests_adults || 0, kids: v.guests_kids || 0,
     song: v.song_request || "", note: v.note || ""
   };
@@ -803,6 +825,15 @@ function playIntro() {
 /* ================================================================
    Form rendering
    ================================================================ */
+function renderChoirs() {
+  const box = $("#choirs");
+  if (!box.children.length) box.innerHTML = CHOIRS.map(c => `<button type="button" class="choir" role="radio" aria-checked="false" data-choir="${c.id}">${esc(c.name)}</button>`).join("");
+  $$(".choir", box).forEach(function (b) {
+    const sel = S.draft.choir === b.dataset.choir;
+    b.setAttribute("aria-checked", String(sel));
+    b.tabIndex = sel || (!S.draft.choir && b.dataset.choir === CHOIRS[0].id) ? 0 : -1;
+  });
+}
 function renderParts() {
   const box = $("#parts");
   if (!box.children.length) {
@@ -901,8 +932,8 @@ function renderExtras() {
 }
 function renderForm() {
   if ($("#nameInput") !== document.activeElement) $("#nameInput").value = S.draft.name;
-  renderParts(); renderDates(); renderVenues(); renderExtras(); renderMe();
-  const existing = voteByKey(keyOf(S.draft.name));
+  renderChoirs(); renderParts(); renderDates(); renderVenues(); renderExtras(); renderMe();
+  const existing = S.draft.choir && voteByKey(voteKey(S.draft.name, S.draft.choir));
   $("#saveBtn").textContent = existing ? "Update my vote" : "Save my vote";
 }
 function renderMe() {
@@ -916,8 +947,11 @@ function renderVoterChips() {
   const sig = S.votes.map(v => v.name_key + v.voice_part + v.name).join("|");
   if (box.dataset.sig === sig) return;
   box.dataset.sig = sig;
-  box.innerHTML = S.votes.slice().sort((a, b) => a.name.localeCompare(b.name)).map(v =>
-    `<button type="button" class="chip" data-key="${esc(v.name_key)}" style="--c:${(PARTS[v.voice_part] || PARTS.X).css}"><span class="dot" aria-hidden="true"></span>${esc(v.name)}</button>`).join("");
+  const chip = v => `<button type="button" class="chip" data-key="${esc(v.name_key)}" style="--c:${(PARTS[v.voice_part] || PARTS.X).css}"><span class="dot" aria-hidden="true"></span>${esc(v.name)}</button>`;
+  const groups = CHOIRS.map(c => [c.name, S.votes.filter(v => v.choir === c.id)]);
+  groups.push(["No choir picked", S.votes.filter(v => !choirById(v.choir))]);
+  box.innerHTML = groups.filter(g => g[1].length).map(g =>
+    `<div class="chipgroup"><h4>${esc(g[0])}</h4><div class="chips">${g[1].slice().sort((a, b) => a.name.localeCompare(b.name)).map(chip).join("")}</div></div>`).join("");
 }
 
 /* ================================================================
@@ -998,11 +1032,18 @@ function costLine(c) {
   const who = plural(hc.adults, "adult", "adults") + (hc.kids ? " and " + plural(hc.kids, "kid", "kids") : "");
   return `Rough cost if everyone free that night comes (${who}): ${peso(total)}, about ${peso(per)} per adult. Based on ${c.v.costNote}.`;
 }
+function choirCounts(list) {
+  return CHOIRS.map(c => [c, list.filter(v => v.choir === c.id).length]);
+}
+function choirBreak(list) {
+  return choirCounts(list).map(x => x[1] + " " + x[0].short).join(", ");
+}
 function renderSummary() {
   const n = S.votes.length;
   if (!n) { $("#summary").textContent = S.error ? "Votes couldn't load. They'll appear here once the connection is back." : S.loaded ? "No votes yet. Be the first voice: scroll up and add yours." : "Loading votes..."; return; }
-  const parts = PART_ORDER.map(k => [k, S.votes.filter(v => (v.voice_part || "X") === k).length]).filter(x => x[1]);
-  const bits = parts.map(x => plural(x[1], PARTS[x[0]].name.toLowerCase(), PARTS[x[0]].plural.toLowerCase()));
+  const bits = choirCounts(S.votes).filter(x => x[1]).map(x => x[1] + " from " + x[0].name);
+  const none = S.votes.filter(v => !choirById(v.choir)).length;
+  if (none) bits.push(none + " with no choir picked");
   $("#summary").textContent = plural(n, "vote", "votes") + " so far: " + listJoin(bits) + ".";
 }
 function renderBest() {
@@ -1016,7 +1057,7 @@ function renderBest() {
     if (!counts[topDate.id]) { box.innerHTML = `<div class="empty">Everyone who voted so far is resting this one. Hopefully more nights open up.</div>`; return; }
     box.innerHTML = `<div class="best"><p class="lbl">Leading night so far</p>
       <p class="big">${topDate.label}</p>
-      <p class="why">${plural(counts[topDate.id], "person is", "people are")} free that night. No venue picks yet.</p>
+      <p class="why">${plural(counts[topDate.id], "person is", "people are")} free that night (${choirBreak(freeOn(topDate.id))}). No venue picks yet.</p>
       <div class="row"><button class="btn btn-sm" type="button" data-playdate="${topDate.id}">Hear this night</button></div></div>`;
     return;
   }
@@ -1024,7 +1065,7 @@ function renderBest() {
   const runners = withFans.slice(1, 4).map(c => `<li><b>${c.d.label} at ${esc(c.v.short)}</b>: ${c.fans.length} of ${c.free.length} free that night like it${c.confirmed ? "" : " (night not confirmed yet)"}</li>`).join("");
   box.innerHTML = `<div class="best"><p class="lbl">Best match so far</p>
     <p class="big">${b.d.label} at ${esc(b.v.name)}</p>
-    <p class="why">${plural(b.free.length, "person is", "people are")} free that night, and ${b.fans.length === b.free.length ? "all of them" : b.fans.length + " of them"} picked this venue.${b.confirmed ? "" : " We're still confirming this venue has that night open."}</p>
+    <p class="why">${plural(b.free.length, "person is", "people are")} free that night (${choirBreak(b.free)}), and ${b.fans.length === b.free.length ? "all of them" : b.fans.length + " of them"} picked this venue.${b.confirmed ? "" : " We're still confirming this venue has that night open."}</p>
     ${costLine(b) ? `<p class="cost">${esc(costLine(b))}</p>` : ""}
     <div class="row"><button class="btn btn-sm" type="button" data-cadence="${b.d.id}">Hear it resolve</button></div>
     ${runners ? `<ul class="runners">${runners}</ul>` : ""}</div>`;
@@ -1094,7 +1135,8 @@ function systemSVG(d, lay, width) {
     else { for (let l = 16; l >= s; l -= 2) led.push(yB(l)); for (let l = 28; l <= s; l += 2) led.push(yB(l)); }
     const me = n.v.name_key === S.meKey;
     const fresh = S.fresh && S.fresh.has(n.v.name_key + "|" + d.id);
-    const label = n.v.name + ", " + p.name.toLowerCase();
+    const ch = choirById(n.v.choir);
+    const label = n.v.name + ", " + p.name.toLowerCase() + (ch ? ", " + ch.short : "");
     let g = `<g class="note${me ? " mine" : ""}${fresh ? " fresh" : ""}" data-col="${n.col}" data-label="${esc(label)}" tabindex="0" role="img" aria-label="${esc(label)}" style="color:${p.color}"><title>${esc(label)}</title>`;
     led.forEach(ly => g += `<line class="ledger" x1="${x - 10}" x2="${x + 10}" y1="${ly}" y2="${ly}"/>`);
     if (n.part === "X") g += `<path class="n-head" d="M${x - 6.5} ${y} L${x} ${y - 5} L${x + 6.5} ${y} L${x} ${y + 5}Z" fill="currentColor"/>`;
@@ -1119,7 +1161,7 @@ function renderScore() {
     const names = PART_ORDER.filter(k => lay.by[k].length).map(k => `<b>${PARTS[k].plural}:</b> ${lay.by[k].map(v => esc(v.name)).join(", ")}`).join(". ");
     return `<div class="system${max && counts[d.id] === max ? " top" : ""}" data-date="${d.id}">
       <div class="sys-head">
-        <div><h3>${d.label}</h3><span class="nights">${d.nights}</span></div>
+        <div><h3>${d.label}</h3><span class="nights">${d.nights}</span>${lay.voters.length ? `<span class="cbreak">${choirBreak(lay.voters)}</span>` : ""}</div>
         <div class="sys-meta"><span>${plural(lay.voters.length, "voice", "voices")}</span>
           <span class="pb" aria-label="${full ? "All four parts covered" : "Parts covered"}">${["S", "A", "T", "B"].map(k => `<b class="${has(k) ? "on" : ""}" style="--c:${PARTS[k].css}" title="${PARTS[k].plural}">${k}</b>`).join("")}</span></div>
         <button class="btn btn-sm" type="button" data-playdate="${d.id}" ${lay.voters.length ? "" : "disabled"}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2v12l11-6z" fill="currentColor"/></svg>Play this night</button>
@@ -1149,15 +1191,18 @@ function renderTally() {
   }).join("");
 }
 function renderRoll() {
-  const groups = PART_ORDER.map(k => [k, S.votes.filter(v => (PARTS[v.voice_part] ? v.voice_part : "X") === k && !v.cant_make_it)]).filter(g => g[1].length);
+  const order = v => PART_ORDER.indexOf(PARTS[v.voice_part] ? v.voice_part : "X");
+  const groups = CHOIRS.map(c => [c.name, S.votes.filter(v => v.choir === c.id && !v.cant_make_it)]);
+  groups.push(["No choir picked", S.votes.filter(v => !choirById(v.choir) && !v.cant_make_it)]);
   const resting = S.votes.filter(v => v.cant_make_it);
-  let h = groups.map(g => `<section style="--c:${PARTS[g[0]].css}"><h4>${PARTS[g[0]].plural} (${g[1].length})</h4><p>${g[1].map(v => esc(v.name) + ` <span style="color:var(--capiz-3)">${(v.dates || []).map(id => dateById(id).label.replace("Dec ", "")).join(", ")}</span>`).join("; ")}</p></section>`).join("");
-  if (resting.length) h += `<section style="--c:var(--capiz-3)"><h4>Resting this one (${resting.length})</h4><p>${resting.map(v => esc(v.name)).join(", ")}</p></section>`;
+  const person = v => { const p = PARTS[v.voice_part] || PARTS.X; return `${esc(v.name)}<span class="pl" style="--c:${p.css}" title="${p.name}">${v.voice_part && v.voice_part !== "X" ? v.voice_part : ""}</span> <span style="color:var(--capiz-3)">${(v.dates || []).map(id => dateById(id).label.replace("Dec ", "")).join(", ")}</span>`; };
+  let h = groups.filter(g => g[1].length).map(g => `<section style="--c:var(--gold)"><h4>${esc(g[0])} (${g[1].length})</h4><p>${g[1].slice().sort((a, b) => order(a) - order(b) || a.name.localeCompare(b.name)).map(person).join("; ")}</p></section>`).join("");
+  if (resting.length) h += `<section style="--c:var(--capiz-3)"><h4>Resting this one (${resting.length})</h4><p>${resting.map(v => esc(v.name) + (choirById(v.choir) ? ` <span style="color:var(--capiz-3)">(${choirById(v.choir).short})</span>` : "")).join(", ")}</p></section>`;
   $("#roll").innerHTML = h || `<p class="subp">Names appear here as people vote.</p>`;
 }
 function renderSetlist() {
   const songs = S.votes.filter(v => v.song_request && v.song_request.trim());
-  $("#setlist").innerHTML = songs.length ? songs.map(v => `<li>${esc(v.song_request)} <span>for ${esc(v.name)}</span></li>`).join("") : `<li style="list-style:none;margin-left:-1.4em;color:var(--capiz-2)">No requests yet. Add one in step D.</li>`;
+  $("#setlist").innerHTML = songs.length ? songs.map(v => `<li>${esc(v.song_request)} <span>for ${esc(v.name)}${choirById(v.choir) ? " (" + choirById(v.choir).short + ")" : ""}</span></li>`).join("") : `<li style="list-style:none;margin-left:-1.4em;color:var(--capiz-2)">No requests yet. Add one in step D.</li>`;
 }
 function renderLegend() {
   $("#legend").innerHTML = PART_ORDER.map(k => `<span style="--c:${PARTS[k].css}"><i></i>${PARTS[k].name}</span>`).join("");
@@ -1189,7 +1234,7 @@ async function refresh(first) {
     S.seen = sig;
     S.votes = rows; S.loaded = true; S.error = null;
     if (first) {
-      const k = S.meKey || keyOf(S.draft.name);
+      const k = S.meKey || (S.draft.choir && voteKey(S.draft.name, S.draft.choir));
       const mine = k && voteByKey(k);
       if (mine && !S.draft.dates.length && !S.draft.venues.length && !S.draft.none) loadVoteIntoDraft(mine);
       else if (mine) S.loadedKey = mine.name_key;
@@ -1209,6 +1254,7 @@ async function refresh(first) {
 function validate() {
   const d = S.draft, name = normName(d.name);
   if (!name) return ["Add your name in step A first.", "#nameInput"];
+  if (!d.choir) return ["Pick your choir in step A.", "#choirs"];
   if (!d.part) return ["Pick your voice part in step A.", "#parts"];
   if (!d.dates.length && !d.none) return ["Pick at least one night in step B, or choose the rest option.", "#dates"];
   return null;
@@ -1234,11 +1280,11 @@ async function save() {
   if (bad) { const t = $(bad[1]); t.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "center" }); if (t.focus) t.focus({ preventScroll: true }); Sound.dateOff(); return; }
   const d = S.draft;
   let name = normName(d.name);
-  const prev = voteByKey(keyOf(name));
+  const prev = voteByKey(voteKey(name, d.choir));
   // typing "ana" to edit shouldn't turn "Ana" into "ana"
   if (prev && name === name.toLowerCase() && prev.name !== prev.name.toLowerCase()) name = prev.name;
   const row = {
-    name: name, name_key: keyOf(name), voice_part: d.part,
+    name: name, name_key: voteKey(name, d.choir), choir: d.choir, voice_part: d.part,
     dates: d.none ? [] : DATES.map(x => x.id).filter(id => d.dates.includes(id)),
     cant_make_it: !!d.none,
     venues: VENUES.map(v => v.id).filter(id => d.venues.includes(id)),
@@ -1283,13 +1329,46 @@ function wire() {
   nameIn.addEventListener("keydown", function (e) { if (e.key.length === 1) Sound.key(e.key); if (e.key === "Enter") { e.preventDefault(); const p = $(".part[tabindex='0']"); if (p) p.focus(); } });
   nameIn.addEventListener("input", function () {
     S.draft.name = nameIn.value; saveDraft();
-    const k = keyOf(nameIn.value), v = k && voteByKey(k);
-    const hint = $("#nameHint");
+    matchVoter();
+  });
+  function matchVoter() {
+    const nl = nameLower(nameIn.value), hint = $("#nameHint");
+    const same = nl ? S.votes.filter(x => nameLower(x.name) === nl) : [];
+    let v = S.draft.choir ? same.find(x => x.choir === S.draft.choir) : (same.length === 1 ? same[0] : null);
+    if (!S.draft.choir && same.length > 1) {
+      hint.textContent = "More than one " + same[0].name + " has voted. Pick your choir to load yours."; hint.className = "hint gold";
+      $("#saveBtn").textContent = "Save my vote"; return;
+    }
     if (v && v.name_key !== S.loadedKey && !S.touched) { loadVoteIntoDraft(v); hint.textContent = "Welcome back, " + v.name + ". Your saved answers are loaded, change anything you like."; hint.className = "hint gold"; }
-    else if (v && v.name_key !== S.loadedKey) { hint.textContent = "Someone named " + v.name + " already voted. Saving will replace that vote."; hint.className = "hint gold"; }
+    else if (v && v.name_key !== S.loadedKey) { hint.textContent = "Someone named " + v.name + " from " + (choirById(v.choir) ? choirById(v.choir).name : "this choir") + " already voted. Saving will replace that vote."; hint.className = "hint gold"; }
     else if (!v) { hint.textContent = ""; hint.className = "hint"; if (S.loadedKey) S.loadedKey = ""; }
     $("#saveBtn").textContent = v ? "Update my vote" : "Save my vote";
+  }
+  $("#choirs").addEventListener("click", function (e) {
+    const b = e.target.closest(".choir"); if (!b) return;
+    S.draft.choir = b.dataset.choir; saveDraft(); renderChoirs(); b.focus();
+    const c = choirById(b.dataset.choir);
+    if (Sound.on) { Sound.unlock(); c.arp.forEach((m, i) => Sound.bell(m + 12, 0, 1.1, 0.1)); }
+    onChoirChange();
   });
+  $("#choirs").addEventListener("keydown", function (e) {
+    const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    if (!(e.key in keys)) return;
+    e.preventDefault();
+    const ids = CHOIRS.map(c => c.id), i = Math.max(0, ids.indexOf(S.draft.choir));
+    S.draft.choir = ids[(i + keys[e.key] + ids.length) % ids.length]; saveDraft(); renderChoirs();
+    $(`.choir[data-choir="${S.draft.choir}"]`).focus();
+    onChoirChange();
+  });
+  function onChoirChange() {
+    // answers loaded for a same-named person in another choir aren't this person's: clear them
+    const loaded = S.loadedKey && voteByKey(S.loadedKey);
+    if (loaded && loaded.choir !== S.draft.choir && !S.touched) {
+      S.draft = Object.assign(blankDraft(), { name: S.draft.name, choir: S.draft.choir });
+      S.loadedKey = ""; saveDraft(); renderForm();
+    }
+    if (nameIn.value.trim()) matchVoter();
+  }
 
   $("#parts").addEventListener("click", function (e) {
     const b = e.target.closest(".part"); if (!b) return;
@@ -1394,8 +1473,7 @@ function hideTips() { $$(".tip.show").forEach(t => t.classList.remove("show")); 
    Boot
    ================================================================ */
 (function boot() {
-  const choir = CONFIG.CHOIR_NAME.trim();
-  $("#subtitle").textContent = (choir ? choir : "Choir") + " Christmas Party 2026";
+  $("#trio").textContent = listJoin(CHOIRS.map(c => c.name.replace(/ /g, "\u00a0")));   // keep each choir name on one line
   if (CONFIG.VOTING_DEADLINE) $("#deadline").innerHTML = `<span class="deadline">Vote by ${esc(CONFIG.VOTING_DEADLINE)}</span>`;
   $("#footOrg").textContent = "Questions about the party? Message " + CONFIG.ORGANIZER + ".";
   $("#soundBtn").setAttribute("aria-pressed", String(Sound.on));
