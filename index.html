@@ -75,7 +75,61 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .hero-staff .hn.lit .n-head{filter:drop-shadow(0 0 7px rgba(244,183,64,.9))}
 @keyframes drop{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:none}}
 .intro{max-width:33em;margin:10px auto 0;color:var(--capiz-2)}
-.deadline{display:inline-block;margin-top:14px;font-weight:600;color:var(--capiz);border:1.5px solid var(--gold);border-radius:999px;padding:5px 14px;font-size:15px}
+/* countdown bar: its dynamic marking grows louder as Saturday gets closer */
+.topbar{flex-wrap:wrap;row-gap:0}
+.cd{flex:1 0 100%;order:9;margin:10px -16px -10px;padding:7px 16px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);background:rgba(244,183,64,.08);transition:background-color .4s}
+.cd[hidden]{display:none}
+.cd .dyn{flex:none;min-width:1.7em;text-align:center;font:italic 400 22px/1 var(--serif);color:var(--gold);letter-spacing:-.03em}
+.cd-text{margin:0;flex:1;min-width:0;font-size:14.5px;line-height:1.3}
+.cd-time{color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cd-btn{flex:none;border:1.5px solid var(--gold);background:var(--gold);color:var(--gold-ink);border-radius:999px;padding:7px 13px;font:700 13.5px/1 var(--sans);white-space:nowrap}
+.cd-btn:hover{background:#FFC657}
+.cd[data-s="f"] .dyn{font-size:26px}
+.cd[data-s="ff"]{background:rgba(244,183,64,.17)}
+.cd[data-s="ff"] .dyn{font-size:29px}
+.cd[data-s="coda"]{background:#6B1A2B;border-top-color:#B33A52}
+.cd[data-s="coda"] .dyn{font-size:31px;color:var(--rose);animation:beat 1s ease-in-out infinite}
+.cd[data-s="coda"] .cd-time{color:#FFE0DA}
+.cd[data-s="coda"] .cd-btn{background:var(--rose);border-color:var(--rose);color:#3A0A14}
+.cd[data-s="fine"]{background:rgba(92,196,151,.12)}
+.cd[data-s="fine"] .dyn{color:var(--pine);font-size:21px}
+@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.16)}}
+.cd-s{display:none}
+@media (max-width:600px){.cd-l{display:none}.cd-s{display:inline}.cd-time{display:block}}
+/* the two deadlines, at the top of the form */
+.cues{margin:0 0 26px;border:1.5px solid var(--line-2);border-radius:14px;padding:14px 16px;background:var(--night-2)}
+.cues-k{margin:0 0 10px;font:italic 400 19px/1.25 var(--serif);color:var(--gold)}
+.cues dl{margin:0;display:grid;gap:10px}
+.cues dl>div{display:grid;gap:2px}
+@media (min-width:600px){.cues dl>div{grid-template-columns:13em 1fr;gap:14px}}
+.cues dt{font-weight:600}
+.cues dd{margin:0;color:var(--capiz-2)}
+.cues dd b{color:var(--pine)}
+/* final-call panel in the hero */
+.call{margin:8px auto 22px;max-width:580px;text-align:left;background:var(--night-2);border:1.5px solid var(--line);border-radius:18px;padding:16px 18px 18px}
+.call-k{margin:0 0 10px;font:italic 400 19px/1.2 var(--serif);color:var(--gold)}
+.ctally{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ctally li{border:1.5px solid var(--line);border-radius:12px;padding:10px 6px 9px;text-align:center}
+.ctally li.mine{border-color:var(--gold)}
+.ctally b{display:block;font:700 32px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--capiz)}
+.ctally b.bump{animation:bump .7s cubic-bezier(.2,.9,.25,1.3)}
+.ctally span{display:block;font-size:13.5px;line-height:1.2;color:var(--capiz-2);margin-top:5px}
+@keyframes bump{0%{transform:scale(1);color:var(--capiz)}35%{transform:scale(1.3);color:var(--gold)}100%{transform:scale(1);color:var(--capiz)}}
+.call-row{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;margin-top:12px}
+.call-row p{margin:0;font-size:14.5px;color:var(--capiz-2)}
+.call-why,.call-tease{margin:14px 0 0;font-size:15.5px;color:var(--capiz-2)}
+.call-why{padding-top:14px;border-top:1px solid var(--line)}
+.call-why b,.call-tease b{color:var(--capiz)}
+.v-h{font:400 clamp(2rem,7vw,2.6rem)/1.05 var(--serif);margin:0 0 8px}
+.v-big{font:400 clamp(1.45rem,5vw,1.8rem)/1.2 var(--serif);color:var(--gold);margin:0 0 8px}
+.v-why{margin:0 0 6px;color:var(--capiz-2);font-size:15.5px}
+.v-note{margin:0 0 14px;font-size:15.5px}
+/* share card, shown once you've voted */
+.sharecard{margin:18px 0 6px;border:1.5px solid var(--gold);border-radius:16px;padding:16px 18px;background:#1B2458}
+.sharecard h3{margin:0 0 6px;font:400 24px/1.15 var(--serif)}
+.sharecard p{margin:0 0 12px;color:var(--capiz-2)}
+.sc-msg{margin:0 0 14px;padding:10px 14px;border-left:3px solid var(--gold);background:rgba(239,231,214,.06);border-radius:0 10px 10px 0;font-size:15.5px}
+.sc-msg span{display:block;color:var(--gold);margin-top:4px;overflow-wrap:anywhere}
 .hero-actions{margin-top:20px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 
 .btn{border-radius:12px;padding:13px 20px;font:600 16px/1 var(--sans);border:1.5px solid var(--line-2);background:transparent;display:inline-flex;align-items:center;gap:9px;justify-content:center;text-decoration:none;color:var(--capiz)}
@@ -271,6 +325,7 @@ textarea.input{font-size:17px;min-height:88px;resize:vertical;line-height:1.45}
 .trow .tn{text-align:right;font-weight:600}
 .roll{display:grid;gap:18px;margin-top:14px}
 @media (min-width:980px){.roll{grid-template-columns:repeat(3,minmax(0,1fr));width:min(1180px,calc(100vw - 48px));margin-left:calc(50% - min(590px,50vw - 24px))}}
+#roll{scroll-margin-top:64px}
 .rc-col{background:var(--night-2);border:1.5px solid var(--line);border-radius:16px;padding:14px 14px 6px;min-width:0}
 .rc-col h4{margin:0 0 6px;font:400 22px/1.15 var(--serif);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .rc-col h4 span{font:600 14px var(--sans);color:var(--capiz-2)}
@@ -368,6 +423,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
 @keyframes fly{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--r))}}
 
 @media (prefers-reduced-motion:reduce){
+  .cd[data-s="coda"] .dyn,.ctally b.bump{animation:none}
   *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   .fly{display:none}
 }
@@ -383,6 +439,11 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="mute" d="m16 9 6 6m0-6-6 6"/></svg>
     <span class="lbl" id="soundLbl">Sound on</span>
   </button>
+  <div class="cd" id="cd" role="region" aria-label="Voting deadline" hidden>
+    <span class="dyn" id="cdDyn" aria-hidden="true"></span>
+    <p class="cd-text"><span id="cdMsg"></span> <span class="cd-time" id="cdTime"></span></p>
+    <button class="cd-btn" id="cdBtn" type="button"></button>
+  </div>
 </header>
 
 <main id="top">
@@ -391,9 +452,9 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
     <p class="sub">Christmas Party 2026</p>
     <p class="trio" id="trio"></p>
     <svg class="hero-staff" id="heroStaff" viewBox="0 0 660 132" role="img" aria-label="The opening notes of Joy to the World"></svg>
+    <div class="call" id="call" hidden></div>
     <p class="intro">Pick the nights you can make it between Dec 26 and 29, tell us which venue you like, and request a song. Everyone's answers show up live at the bottom of the page.</p>
     <p class="theme">Theme: <a href="#dresscode">Wrong Attire for the Wrong Event</a></p>
-    <div id="deadline"></div>
     <div class="hero-actions">
       <a class="btn btn-gold" href="#step-a">Start voting</a>
       <button class="btn" id="playIntro" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2v12l11-6z" fill="currentColor"/></svg>Play the intro</button>
@@ -408,6 +469,13 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
         <span class="mark" aria-hidden="true">A</span>
         <div><p class="tempo">Andante</p><h2 id="h-a">Who's singing?</h2>
         <p class="lede">Your name, your choir and your voice part. Tap a part to hear its pitch pipe.</p></div>
+      </div>
+      <div class="cues" id="cues" hidden>
+        <p class="cues-k" id="cuesK"></p>
+        <dl>
+          <div><dt>Voting on nights and venue</dt><dd id="cueVote"></dd></div>
+          <div><dt>Signing up for the party</dt><dd><b>Open until party day.</b> Missed the vote? You can still add your name, voice part, look and pledge.</dd></div>
+        </dl>
       </div>
       <div class="field">
         <label for="nameInput">Your name, the way the choir knows you</label>
@@ -434,7 +502,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       <div class="step-head">
         <span class="mark" aria-hidden="true">B</span>
         <div><p class="tempo">Allegro</p><h2 id="h-b">Which nights can you make it?</h2>
-        <p class="lede">It's an overnight party, so each option is two days. Pick every one that works for you.</p></div>
+        <p class="lede">It's an overnight party, so each option is two days. Pick every one that works for you.<span class="vclose"></span></p></div>
       </div>
       <div class="dates" id="dates"></div>
       <button class="rest" id="restBtn" type="button" aria-pressed="false">
@@ -449,7 +517,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       <div class="step-head" style="max-width:720px">
         <span class="mark" aria-hidden="true">C</span>
         <div><p class="tempo">Con brio</p><h2 id="h-c">Where should we celebrate?</h2>
-        <p class="lede">Swipe or tap the photos to look around. Mark every place you'd be happy with.</p></div>
+        <p class="lede">Swipe or tap the photos to look around. Mark every place you'd be happy with.<span class="vclose"></span></p></div>
       </div>
       <div class="venues" id="venues"></div>
     </div>
@@ -530,6 +598,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
     <div class="wrap">
       <p class="tempo">Tutti</p>
       <h2 id="h-r">Where everyone stands</h2>
+      <div id="shareCard"></div>
       <p class="summary" id="summary">Loading votes...</p>
       <div id="best"></div>
     </div>
@@ -595,7 +664,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
     <p class="tempo">Fortissimo</p>
     <h3 id="tdTitle">Salamat kaayo!</h3>
     <p id="tdBody"></p>
-    <div class="modal-actions"><button class="btn btn-gold" id="tdOk" type="button">See the roll call</button></div>
+    <div class="modal-actions"><button class="btn" id="tdShare" type="button" data-share>Tag a choirmate</button><button class="btn btn-gold" id="tdOk" type="button">See the roll call</button></div>
   </div>
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -610,7 +679,12 @@ const CONFIG = {
   SUPABASE_KEY: "sb_publishable_boKVP7k36iEFYikPRz3spA_d196OI1i",
   TABLE: "choir_xmas_votes",
   CONTACTS: "Marius Yohann Lustre, Ate Bebe, or Mam Mayie",   // shown in the footer
-  VOTING_DEADLINE: "",     // e.g. "Sunday, Dec 7". Blank hides the deadline pill
+  VOTING_DEADLINE: "2026-11-28T23:59:59+08:00",   // Saturday, Nov 28, 11:59 PM Manila time. Blank hides the countdown
+  // After the deadline the top of the page shows the leading night + venue from the votes.
+  // To announce the organizers' official pick instead, fill these in, e.g. { date: "d28", venue: "bulasa" }
+  FINAL_PICK: { date: "", venue: "" },
+  SITE_URL: "https://choirxmasparty.vercel.app/",
+  INVITE: "I'm in for the Choir Christmas Party this year! Votes close Saturday, vote na para ma-count ka.",
   POLL_MS: 12000
 };
 
@@ -1144,6 +1218,7 @@ function updateSaveLabel() {
   $("#saveBtn").textContent = (existing ? "Update my vote" : "Save my vote") + (pledging ? " and pledge" : "");
 }
 function renderMe() {
+  if (typeof renderCountdown === "function" && $("#cd").dataset.s) { renderCountdown(); renderShareCard(); }
   const v = S.meKey && voteByKey(S.meKey);
   $("#me").classList.toggle("show", !!v);
   if (v) $("#meName").textContent = v.name + (PARTS[v.voice_part] && v.voice_part !== "X" ? " (" + PARTS[v.voice_part].name + ")" : "");
@@ -1424,6 +1499,7 @@ function renderLegend() {
 }
 function renderResults() {
   renderSummary(); renderBest(); renderScore(); renderTally(); renderRoll(); renderSetlist();
+  renderCall(); renderShareCard(); renderCountdown();
 }
 
 /* ================================================================
@@ -1530,6 +1606,147 @@ async function save() {
   } finally {
     S.saving = false; btn.disabled = false; renderForm();
   }
+}
+
+/* ================================================================
+   Deadline: countdown bar, final-call panel, verdict, sharing
+   ================================================================ */
+const DEADLINE = Date.parse(CONFIG.VOTING_DEADLINE) || 0;
+const MNL = { timeZone: "Asia/Manila" };
+const manilaDay = t => new Date(t + 8 * 3600e3).toISOString().slice(0, 10);
+const dayLabel = t => new Date(t).toLocaleDateString("en-US", Object.assign({ weekday: "long", month: "short", day: "numeric" }, MNL));
+const closed = () => !!DEADLINE && Date.now() > DEADLINE;
+function stageAt(t) {
+  if (!DEADLINE) return "";
+  const left = DEADLINE - t;
+  if (left <= 0) return "fine";
+  if (left <= 3 * 3600e3) return "coda";
+  if (manilaDay(t) === manilaDay(DEADLINE)) return "ff";
+  if (manilaDay(t + 864e5) === manilaDay(DEADLINE)) return "f";
+  return "mf";
+}
+const DYN = { mf: "mf", f: "f", ff: "ff", coda: "fff", fine: "Fine" };
+function timeLeft(ms, st) {
+  const s = Math.max(0, Math.floor(ms / 1000)), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+  const p2 = n => String(n).padStart(2, "0");
+  if (st === "coda") return p2(h) + ":" + p2(m) + ":" + p2(sec);
+  if (d) return d + "d " + h + "h left";
+  return h + "h " + p2(m) + "m left";
+}
+function iVoted() { return !!(S.meKey && voteByKey(S.meKey)); }
+function renderCountdown() {
+  const bar = $("#cd");
+  if (!DEADLINE) { bar.hidden = true; return; }
+  const t = Date.now(), st = stageAt(t), left = DEADLINE - t;
+  const two = (l, sh) => `<span class="cd-l">${l}</span><span class="cd-s">${sh}</span>`;
+  const msgs = {
+    mf: two(`<b>Date &amp; venue</b> votes close <b>${dayLabel(DEADLINE)}</b>. Sign-ups stay open till the party.`, `<b>Date &amp; venue</b> vote ends Sat`),
+    f: two(`<b>One day left</b> to vote on the date &amp; venue. Sign-ups stay open till the party.`, `<b>1 day left</b> for date &amp; venue`),
+    ff: two(`<b>Last day</b> to vote on the date &amp; venue! Closes tonight at 11:59 PM.`, `<b>Last day</b> for date &amp; venue!`),
+    coda: two(`<b>Final bars!</b> Date &amp; venue voting closes in`, `<b>Final bars!</b> Vote closes in`),
+    fine: two(`<b>Date &amp; venue voting is closed.</b> Sign-ups stay open until the party!`, `<b>Vote closed.</b> Sign-ups still open!`)
+  };
+  const btn = st === "fine" ? (iVoted() ? "See the verdict" : "Sign up now") : iVoted() ? "Tag a choirmate" : "Vote now";
+  const sig = st + "|" + btn;
+  if (bar.dataset.sig !== sig) {
+    const was = bar.dataset.s;
+    bar.dataset.sig = sig; bar.dataset.s = st; bar.hidden = false;
+    $("#cdDyn").textContent = DYN[st];
+    $("#cdMsg").innerHTML = msgs[st];
+    $("#cdBtn").textContent = btn;
+    if (was && was !== st) { renderCall(); renderShareCard(); }
+    syncHeader();
+  }
+  $("#cdTime").textContent = st === "fine" ? "" : timeLeft(left, st);
+}
+function syncHeader() { document.documentElement.style.scrollPaddingTop = ($(".topbar").offsetHeight + 12) + "px"; }
+function leader() {
+  const pick = CONFIG.FINAL_PICK || {};
+  const all = combos();
+  if (pick.date && venueById(pick.venue)) {
+    const d = dateById(pick.date), v = venueById(pick.venue), free = freeOn(d.id);
+    return { d: d, v: v, free: free, fans: free.filter(x => (x.venues || []).includes(v.id)), official: true };
+  }
+  const withFans = all.filter(c => c.fans.length);
+  if (withFans.length) return withFans[0];
+  const counts = countByDate(), top = DATES.slice().sort((a, b) => counts[b.id] - counts[a.id])[0];
+  return counts[top.id] ? { d: top, v: null, free: freeOn(top.id), fans: [] } : null;
+}
+function renderCall() {
+  renderCues();
+  const box = $("#call");
+  if (!DEADLINE) { box.hidden = true; return; }
+  box.hidden = false;
+  const mineChoir = (S.meKey && voteByKey(S.meKey) || {}).choir || S.draft.choir;
+  const prev = S.tallyPrev || {};
+  const counts = {};
+  const tally = `<ul class="ctally">${CHOIRS.map(c => {
+    const n = S.votes.filter(v => v.choir === c.id).length; counts[c.id] = n;
+    const up = S.tallyPrev && n > (prev[c.id] || 0);
+    return `<li${c.id === mineChoir ? ' class="mine"' : ""}><b${up ? ' class="bump"' : ""}>${S.loaded ? n : "&ndash;"}</b><span>${esc(c.name)}</span></li>`;
+  }).join("")}</ul>`;
+  if (S.loaded) S.tallyPrev = counts;
+  const rollBtn = `<a class="btn btn-sm" href="#roll" data-roll>See the full roll call</a>`;
+  if (!closed()) {
+    box.innerHTML = `<p class="call-k">Voted so far</p>${tally}
+      <div class="call-row"><p>${iVoted() ? "You're on the list." : "Is your name on the list yet?"}</p>${rollBtn}</div>
+      <p class="call-why"><b>Why ${dayLabel(DEADLINE).split(",")[0]}?</b> Every venue needs a 50% deposit on the rooms to hold our date, and your vote tells us how many rooms to book. Entrance fees are collected at the gate as each guest arrives, so there's nothing to pay for those yet.</p>
+      <p class="call-tease"><b>Saturday is only for the date and venue.</b> Sign-ups, pledges and outfits stay open until the party.</p>
+      <p class="call-tease"><b>The verdict drops ${dayLabel(DEADLINE + 1000)}:</b> the winning night and venue, revealed right here.</p>`;
+    return;
+  }
+  const L = leader();
+  let verdict;
+  if (!L) verdict = `<p class="v-why">No nights got any votes. The organizers will reach out in the group chat.</p>`;
+  else {
+    const where = L.v ? `${L.d.label} at ${esc(L.v.name)}` : L.d.label;
+    const why = plural(L.free.length, "person is", "people are") + " free that night (" + choirBreak(L.free) + ")" +
+      (L.v && L.fans.length ? ", and " + (L.fans.length === L.free.length ? "all of them" : L.fans.length + " of them") + " picked this venue." : ".");
+    verdict = `<p class="v-big">${where}</p><p class="v-why">${why}</p>
+      <p class="v-note">${L.official ? "It's official. See you there!" : "That's where the votes landed. The organizers are confirming the booking now, so watch your group chat for the details."}</p>`;
+  }
+  box.innerHTML = `<p class="call-k">Fine</p><h2 class="v-h" id="verdict">The verdict</h2>${verdict}
+    <p class="call-k" style="margin-top:4px">Final count</p>${tally}
+    <div class="call-row"><p>${iVoted() ? "You're on the list. See you there!" : "Not on the list yet? Sign-ups stay open until the party."}</p>${iVoted() ? rollBtn : `<button class="btn btn-gold btn-sm" type="button" data-signup>Sign up</button>`}</div>`;
+}
+function renderCues() {
+  const box = $("#cues");
+  if (!DEADLINE) { box.hidden = true; return; }
+  box.hidden = false;
+  const done = closed();
+  $("#cuesK").textContent = done ? "The date and venue vote is closed, but you can still join" : "Saturday is only for the date and venue vote";
+  $("#cueVote").textContent = done ? "Closed. The date and venue are at the top of the page." : "Closes " + dayLabel(DEADLINE) + " at 11:59 PM";
+  $$(".vclose").forEach(x => x.textContent = done ? " This vote closed on Saturday; the date and venue are at the top of the page." : " This vote closes " + dayLabel(DEADLINE) + " at 11:59 PM.");
+}
+function renderShareCard() {
+  const box = $("#shareCard");
+  $("#tdShare").hidden = closed();
+  if (closed() || !iVoted()) { box.innerHTML = ""; return; }
+  box.innerHTML = `<div class="sharecard"><h3>You're on the list!</h3>
+    <p>Now help us get everyone else on it before ${dayLabel(DEADLINE).split(",")[0]}. Tag a choirmate who hasn't voted yet.</p>
+    <p class="sc-msg">${esc(CONFIG.INVITE)}<span>${esc(CONFIG.SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</span></p>
+    <button class="btn btn-gold btn-sm" type="button" data-share>Tag a choirmate</button></div>`;
+}
+async function shareInvite(el) {
+  const text = CONFIG.INVITE + "\n" + CONFIG.SITE_URL;
+  Sound.jingle();
+  if (navigator.share) {
+    try { await navigator.share({ text: text }); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    toast("Message copied. Paste it in your group chat!");
+    if (el && !el.dataset.label) {
+      el.dataset.label = el.textContent; el.textContent = "Copied! Paste it in your GC";
+      setTimeout(() => { el.textContent = el.dataset.label; delete el.dataset.label; }, 2600);
+    }
+  }
+  catch (e) { toast("Copy this and send it to your GC: " + text); }
+}
+function goVote() {
+  $("#step-a").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
+  setTimeout(() => $("#nameInput").focus({ preventScroll: true }), reduced() ? 0 : 450);
 }
 
 /* ================================================================
@@ -1690,6 +1907,19 @@ function wire() {
     if (v !== S.draft[k]) { S.draft[k] = v; S.touched = true; saveDraft(); renderExtras(); Sound.bell(+b.dataset.d > 0 ? 76 : 69, 0, 0.5, 0.08); }
   }));
   $("#songInput").addEventListener("input", function () { S.draft.song = this.value; S.touched = true; saveDraft(); });
+  document.addEventListener("click", function (e) {
+    if (e.target.closest("[data-signup]")) { e.preventDefault(); Sound.tick(); goVote(); return; }
+    const sh = e.target.closest("[data-share]");
+    if (sh) { e.preventDefault(); shareInvite(sh); return; }
+    const r = e.target.closest("[data-roll]");
+    if (r) { e.preventDefault(); $("#roll").scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" }); Sound.tick(); }
+  });
+  $("#cdBtn").addEventListener("click", function () {
+    const st = $("#cd").dataset.s;
+    if (st === "fine" && iVoted()) { $("#call").scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" }); Sound.tick(); }
+    else if (iVoted()) shareInvite();   // bar button keeps its label; the toast confirms the copy
+    else { Sound.tick(); goVote(); }
+  });
   $("#asInput").addEventListener("input", function () { S.draft.as = this.value; S.touched = true; saveDraft(); });
   $("#asChips").addEventListener("click", function (e) {
     const c = e.target.closest(".aschip"); if (!c) return;
@@ -1957,12 +2187,14 @@ function wireFits() {
    ================================================================ */
 (function boot() {
   $("#trio").textContent = listJoin(CHOIRS.map(c => c.name.replace(/ /g, "\u00a0")));   // keep each choir name on one line
-  if (CONFIG.VOTING_DEADLINE) $("#deadline").innerHTML = `<span class="deadline">Vote by ${esc(CONFIG.VOTING_DEADLINE)}</span>`;
   $("#footOrg").textContent = "Questions about the party? Message " + CONFIG.CONTACTS + ".";
   $("#soundBtn").setAttribute("aria-pressed", String(Sound.on));
   $("#soundLbl").textContent = Sound.on ? "Sound on" : "Sound off";
   drawHero(); renderLegend(); renderForm(); renderResults(); renderFits(); wire(); wireFits();
   refresh(true);
+  if (DEADLINE) setInterval(renderCountdown, 1000);
+  window.addEventListener("resize", syncHeader);
+  syncHeader();
 })();
 </script>
 </body>
