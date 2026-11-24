@@ -276,6 +276,29 @@ textarea.input{font-size:17px;min-height:88px;resize:vertical;line-height:1.45}
 .roll p{margin:0;font-size:15px;color:var(--capiz-2)}
 .setlist{margin:12px 0 0;padding-left:1.4em;display:grid;gap:6px}
 .setlist li span{color:var(--capiz-2);font-size:14.5px}
+/* dress code row */
+.dress{padding:64px 0 48px;border-top:1px solid var(--line)}
+.dress-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.dress-head .lede{max-width:36em}
+.dress-nav{display:none;gap:8px;flex:0 0 auto}
+@media (hover:hover){.dress-nav{display:flex}}
+.dress-nav button{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--line-2);background:transparent;font-size:24px;line-height:1;display:grid;place-items:center}
+.fits{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(200px,224px);gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:26px max(20px,calc((100% - 1040px) / 2)) 14px;scroll-padding-inline:max(20px,calc((100% - 1040px) / 2));scrollbar-width:thin;scrollbar-color:var(--line-2) transparent;overscroll-behavior-x:contain}
+.fit{scroll-snap-align:start;position:relative;text-align:left;background:var(--night-2);border:1.5px solid var(--line);border-radius:18px;padding:12px 14px 16px;display:flex;flex-direction:column;gap:5px;transition:border-color .15s}
+.fit:hover{border-color:var(--line-2)}
+.fit.say{border-color:var(--gold)}
+.fit-art{display:block;padding-top:30px}
+.fit-art svg{display:block;width:100%;height:auto;transform-origin:50% 95%}
+.fit.wobble .fit-art svg{animation:wobble .65s ease-in-out}
+@keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-6deg)}45%{transform:rotate(5deg)}70%{transform:rotate(-3deg)}85%{transform:rotate(1.5deg)}}
+.fit-name{font:400 23px/1.1 var(--serif);margin-top:4px}
+.fit-where{font-size:14px;color:var(--capiz-2);line-height:1.4}
+.fit-where b{color:var(--capiz);font-weight:600}
+.bubble{position:absolute;top:8px;left:50%;width:max-content;max-width:calc(100% - 20px);transform:translate(-50%,6px) scale(.92);opacity:0;background:var(--capiz);color:#19142E;font-weight:700;font-size:14px;line-height:1.3;padding:7px 11px;border-radius:14px;text-align:center;transition:opacity .18s,transform .18s;pointer-events:none;z-index:2}
+.bubble::after{content:"";position:absolute;bottom:-6px;left:50%;margin-left:-6px;border:6px solid transparent;border-top-color:var(--capiz);border-bottom:0}
+.fit.say .bubble{opacity:1;transform:translate(-50%,0) scale(1)}
+.theme{margin:12px 0 0;color:var(--capiz-2);font-size:16px}
 footer{padding:46px 20px 60px;text-align:center;color:var(--capiz-2);font-size:15px;border-top:1px solid var(--line)}
 footer p{margin:6px 0}
 
@@ -321,6 +344,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
     <p class="trio" id="trio"></p>
     <svg class="hero-staff" id="heroStaff" viewBox="0 0 660 132" role="img" aria-label="The opening notes of Joy to the World"></svg>
     <p class="intro">Pick the nights you can make it between Dec 26 and 29, tell us which venue you like, and request a song. Everyone's answers show up live at the bottom of the page.</p>
+    <p class="theme">Theme: <a href="#dresscode">Wrong Attire for the Wrong Event</a></p>
     <div id="deadline"></div>
     <div class="hero-actions">
       <a class="btn btn-gold" href="#step-a">Start voting</a>
@@ -429,6 +453,19 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       <p class="subp">Song requests so far.</p>
       <ol class="setlist" id="setlist"></ol>
     </div>
+  </section>
+  <section class="dress" id="dresscode" aria-labelledby="h-dc">
+    <div class="wrap wide">
+      <div class="dress-head">
+        <div>
+          <p class="tempo">Stonato</p>
+          <h2 id="h-dc" style="font:400 clamp(2rem,6.6vw,2.5rem)/1.05 var(--serif);margin:0">Dress code: Wrong Attire for the Wrong Event</h2>
+          <p class="lede">Come dressed for anywhere but a Christmas party. Stonato means out of tune, and that's the whole idea. Here are a few looks borrowed from Pinoy memes to get you started. Tap one to hear how off-key it is.</p>
+        </div>
+        <div class="dress-nav"><button type="button" id="fitsPrev" aria-label="Previous outfits">&lsaquo;</button><button type="button" id="fitsNext" aria-label="More outfits">&rsaquo;</button></div>
+      </div>
+    </div>
+    <div class="fits" id="fits" aria-label="Outfit ideas"></div>
   </section>
 </main>
 
@@ -695,6 +732,20 @@ const Sound = (function () {
       src.connect(bp); bp.connect(g); route(g, 0.4); src.start(t); src.stop(t + 0.12);
     }
   }
+  function brass(m, t, dur, droop) {          // muted-trombone "wrong note"
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, t); env.gain.linearRampToValueAtTime(0.12, t + 0.04);
+    env.gain.setValueAtTime(0.12, t + Math.max(0.05, dur - 0.14)); env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.Q.value = 2.5;
+    lp.frequency.setValueAtTime(600, t); lp.frequency.linearRampToValueAtTime(1500, t + 0.08); lp.frequency.linearRampToValueAtTime(800, t + dur);
+    const o = ctx.createOscillator(); o.type = "sawtooth"; o.frequency.value = hz(m);
+    if (droop) {
+      const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 5.5; lg.gain.value = 35;
+      lfo.connect(lg); lg.connect(o.detune); lfo.start(t); lfo.stop(t + dur);
+      o.detune.setValueAtTime(0, t + dur * 0.45); o.detune.linearRampToValueAtTime(-90, t + dur);
+    }
+    o.connect(lp); lp.connect(env); route(env, 0.35); o.start(t); o.stop(t + dur + 0.05);
+  }
   function now() { return ctx ? ctx.currentTime : 0; }
   const api = {
     get on() { return on; },
@@ -708,6 +759,11 @@ const Sound = (function () {
     venueOn() { if (!init()) return; jingle(); bell(81, now() + 0.05, 1.2, 0.1); },
     venueOff() { if (!init()) return; bell(66, 0, 0.5, 0.07); },
     tick() { if (!init()) return; bell(86, 0, 0.25, 0.05); },
+    stonato() {
+      if (!init()) return;
+      const t0 = now() + 0.02, up = Math.floor(Math.random() * 5) - 2;
+      [[58, 0.34], [57, 0.34], [56, 0.34], [55, 1.25]].reduce(function (t, n, i) { brass(n[0] + up, t, n[1] + 0.04, i === 3); return t + n[1]; }, t0);
+    },
     joy(onNote) {                             // Joy to the World, first phrase
       if (!init()) { return 0; }
       const q = 0.36, t0 = now() + 0.05;
@@ -1492,6 +1548,186 @@ function showTip(n) {
 function hideTips() { $$(".tip.show").forEach(t => t.classList.remove("show")); }
 
 /* ================================================================
+   Dress code: Wrong Attire for the Wrong Event (cartoons drawn in code)
+   ================================================================ */
+const FITS = [
+  { id: "marites",   name: "Marites",            where: "By the window, updating the whole street", say: "Mars, ano'ng latest?" },
+  { id: "ninong",    name: "Ninong in hiding",   where: "Dec 25, avoiding every inaanak",           say: "Wala si Ninong." },
+  { id: "tito",      name: "The Tito uniform",   where: "Sunday mall run, keys on the belt loop",   say: "Sa'n ang parking?" },
+  { id: "kumot",     name: "Kumot ni Mama",      where: "Mama's cabinet, saved for visitors",       say: "Kumot ba 'to o polo?" },
+  { id: "pageant",   name: "Pageant night",      where: "The coronation, not the potluck",          say: "And I thank you!" },
+  { id: "liga",      name: "Liga ng barangay",   where: "The barangay court, game 7",               say: "Isa pa! Last game na." },
+  { id: "bagyo",     name: "Signal No. 3",       where: "Wading to the sari-sari store",            say: "Bagyo na, Day!" },
+  { id: "hourglass", name: "The hourglass fit",  where: "Your TikTok feed, Christmas Eve 2025",     say: "Is the fit tuff?" },
+  { id: "whitelady", name: "White Lady",         where: "Undas, Nov 1. You're a month late.",       say: "Na-late ko'g Undas..." }
+];
+
+const INK = "#1A1530";
+const SKIN = { a: "#C98E5C", b: "#B97A4B", c: "#D9A270", pale: "#E9E3F1" };
+const sw = `stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"`;
+function limb(d, color, w) {
+  return `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w + 5}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+const hand = (x, y, skin) => `<circle cx="${x}" cy="${y}" r="6" fill="${skin}" ${sw}/>`;
+function headBase(skin, ears) {
+  return (ears === false ? "" : `<circle cx="57" cy="50" r="5" fill="${skin}" ${sw}/><circle cx="103" cy="50" r="5" fill="${skin}" ${sw}/>`) +
+    `<rect x="74" y="64" width="12" height="15" fill="${skin}" ${sw}/><circle cx="80" cy="48" r="23" fill="${skin}" ${sw}/>`;
+}
+function face(kind) {
+  const blush = `<circle cx="66" cy="57" r="3.6" fill="#F27D72" opacity=".5"/><circle cx="94" cy="57" r="3.6" fill="#F27D72" opacity=".5"/>`;
+  if (kind === "side") return blush + `<ellipse cx="72" cy="48" rx="4.6" ry="3.4" fill="#fff" ${sw}/><ellipse cx="88" cy="48" rx="4.6" ry="3.4" fill="#fff" ${sw}/><circle cx="74.5" cy="48.5" r="2" fill="${INK}"/><circle cx="90.5" cy="48.5" r="2" fill="${INK}"/><path d="M83 40 Q88 37 93 40" fill="none" ${sw}/><ellipse cx="80" cy="60" rx="2.6" ry="3.2" fill="${INK}"/>`;
+  if (kind === "grin") return blush + `<circle cx="72" cy="48" r="2.7" fill="${INK}"/><circle cx="88" cy="48" r="2.7" fill="${INK}"/><path d="M70 56 Q80 69 90 56 Z" fill="#fff" ${sw}/>`;
+  if (kind === "worried") return `<circle cx="72" cy="48" r="4.4" fill="#fff" ${sw}/><circle cx="88" cy="48" r="4.4" fill="#fff" ${sw}/><circle cx="72" cy="49" r="2" fill="${INK}"/><circle cx="88" cy="49" r="2" fill="${INK}"/><path d="M66 41 L76 39 M84 39 L94 41" ${sw} fill="none"/><path d="M72 61 q4 -3.5 8 0 t8 0" fill="none" ${sw}/>`;
+  if (kind === "cool") return `<path d="M68 48 L76 48 M84 48 L92 48" ${sw} stroke-linecap="round"/><path d="M74 60 Q82 63 88 57" fill="none" ${sw} stroke-linecap="round"/>`;
+  if (kind === "queen") return blush + `<path d="M68 48 Q72 44 76 48 M84 48 Q88 44 92 48" fill="none" ${sw} stroke-linecap="round"/><path d="M67 45 l-2 -2 M93 45 l2 -2" ${sw}/><path d="M70 56 Q80 67 90 56 Z" fill="#fff" ${sw}/>`;
+  return blush + `<circle cx="72" cy="48" r="2.7" fill="${INK}"/><circle cx="88" cy="48" r="2.7" fill="${INK}"/><path d="M72 58 Q80 65 88 58" fill="none" ${sw} stroke-linecap="round"/>`;
+}
+const shadow = (rx, op) => `<ellipse cx="80" cy="191" rx="${rx || 38}" ry="5" fill="#000" opacity="${op || .28}"/>`;
+const staff = () => [146, 156, 166, 176, 186].map(y => `<line x1="0" x2="160" y1="${y}" y2="${y}" stroke="#EFE7D6" stroke-opacity=".1" stroke-width="1"/>`).join("");
+const slipper = (x, c) => `<ellipse cx="${x}" cy="184" rx="11" ry="3.6" fill="${c}" ${sw}/><path d="M${x - 5} 183 L${x} 177 L${x + 5} 183" fill="none" ${sw}/>`;
+const sneakerL = c => `<path d="M55 186 Q55 175 69 175 Q77 176 78 186 Z" fill="${c || "#fff"}" ${sw}/>`;
+const sneakerR = c => `<path d="M82 186 Q83 176 91 175 Q105 175 105 186 Z" fill="${c || "#fff"}" ${sw}/>`;
+function hood(color) {
+  return `<path d="M50 56 Q47 16 80 15 Q113 16 110 56 Q110 80 80 82 Q50 80 50 56 Z" fill="${color}" ${sw}/>`;
+}
+function hoodRim(color) {
+  return `<path d="M56 56 Q55 24 80 23 Q105 24 104 56" fill="none" stroke="${INK}" stroke-width="12" stroke-linecap="round"/><path d="M56 56 Q55 24 80 23 Q105 24 104 56" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round"/>`;
+}
+
+function fitArt(id) {
+  let s = staff();
+  if (id === "marites") {
+    const k = SKIN.a, dots = [[66, 96], [88, 92], [78, 112], [62, 126], [96, 118], [72, 140], [92, 146], [56, 150], [104, 150], [84, 130]];
+    s += shadow() + limb("M70 150 L69 180", k, 9) + limb("M90 150 L91 180", k, 9) + slipper(66, "#5CC8C2") + slipper(94, "#5CC8C2");
+    s += `<path d="M57 79 Q80 71 103 79 L115 158 Q80 165 45 158 Z" fill="#F7A1B5" ${sw}/>`;
+    s += dots.map(d => `<circle cx="${d[0]}" cy="${d[1]}" r="3.4" fill="#fff"/><circle cx="${d[0]}" cy="${d[1]}" r="1.3" fill="#F4B740"/>`).join("");
+    s += `<path d="M70 79 Q80 89 90 79" fill="none" ${sw}/>`;
+    s += limb("M58 86 L44 106 L58 121", k, 8) + hand(58, 121, k) + limb("M102 86 L117 104 L104 72", k, 8);
+    s += headBase(k) + `<path d="M57 50 Q54 21 80 21 Q106 21 103 50 Q100 35 80 33 Q62 34 57 50 Z" fill="#3A2418" ${sw}/>`;
+    s += [[61, 19, "#F4B740"], [75, 14, "#A99CF2"], [89, 19, "#5CC8C2"]].map(c => `<rect x="${c[0]}" y="${c[1]}" width="11" height="13" rx="5" fill="${c[2]}" ${sw}/><path d="M${c[0] + 2} ${c[1] + 6.5} h7" stroke="${INK}" stroke-width="1.5"/>`).join("");
+    s += face("side") + `<rect x="99" y="50" width="11" height="20" rx="2.5" fill="${INK}"/><rect x="101" y="53" width="7" height="13" rx="1" fill="#5CC8C2" opacity=".7"/>` + hand(104, 72, k);
+  }
+  if (id === "ninong") {
+    const k = SKIN.b, g = "#7C8197";
+    s += shadow() + limb("M71 128 L69 178", "#34467A", 11) + limb("M89 128 L91 178", "#34467A", 11) + sneakerL() + sneakerR();
+    s += hood(g);
+    s += `<path d="M55 80 Q80 70 105 80 L109 134 Q80 138 51 134 Z" fill="${g}" ${sw}/>`;
+    s += limb("M58 86 L50 112 L66 121", g, 11) + limb("M102 86 L110 112 L94 121", g, 11);
+    s += `<path d="M63 112 L97 112 L101 129 L59 129 Z" fill="#6B7086" ${sw}/><path d="M75 80 L74 96 M85 80 L86 96" ${sw}/><circle cx="74" cy="98" r="2" fill="#fff" ${sw}/><circle cx="86" cy="98" r="2" fill="#fff" ${sw}/>`;
+    s += headBase(k, false) + hoodRim(g);
+    s += `<rect x="62" y="41" width="16" height="11" rx="4" fill="${INK}"/><rect x="82" y="41" width="16" height="11" rx="4" fill="${INK}"/><path d="M78 45 L82 45" ${sw}/><path d="M65 44 l5 0" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".7"/><path d="M85 44 l5 0" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>`;
+    s += `<path d="M62 54 Q80 50 98 54 L96 66 Q80 73 64 66 Z" fill="#BFE0F2" ${sw}/><path d="M66 59 Q80 56 94 59 M67 63 Q80 61 93 63" fill="none" stroke="${INK}" stroke-width="1.2" opacity=".6"/>`;
+    s += `<path d="M113 30 Q117 37 113 40 Q109 37 113 30 Z" fill="#9FD3F5" ${sw}/>`;
+  }
+  if (id === "tito") {
+    const k = SKIN.c, m = "#7FC9A6";
+    s += shadow() + limb("M71 148 L70 170", k, 9) + limb("M89 148 L90 170", k, 9);
+    s += limb("M70 167 L70 180", "#fff", 10) + limb("M90 167 L90 180", "#fff", 10);
+    s += `<rect x="58" y="181" width="24" height="6" rx="2.5" fill="#6B4423" ${sw}/><rect x="78" y="181" width="24" height="6" rx="2.5" fill="#6B4423" ${sw}/><path d="M62 181 v-5 h16 v5 M82 181 v-5 h16 v5" fill="none" stroke="#6B4423" stroke-width="3"/>`;
+    s += `<path d="M54 124 L106 124 L108 153 L82 153 L80 140 L78 153 L52 153 Z" fill="#C8A96E" ${sw}/>`;
+    s += `<path d="M58 80 L46 99 L56 103 L62 90 Z" fill="${m}" ${sw}/><path d="M102 80 L114 99 L104 103 L98 90 Z" fill="${m}" ${sw}/>`;
+    s += limb("M51 102 L49 120", k, 8) + hand(49, 122, k) + limb("M109 102 L111 120", k, 8) + hand(111, 122, k);
+    s += `<path d="M56 80 Q80 71 104 80 L106 126 L54 126 Z" fill="${m}" ${sw}/><path d="M80 86 L80 104" ${sw}/><circle cx="80" cy="93" r="1.6" fill="${INK}"/><circle cx="80" cy="100" r="1.6" fill="${INK}"/>`;
+    s += `<path d="M70 76 L80 87 L73 91 Z" fill="#6AB892" ${sw}/><path d="M90 76 L80 87 L87 91 Z" fill="#6AB892" ${sw}/>`;
+    s += `<rect x="53" y="121" width="55" height="7" fill="#5A3A22" ${sw}/><rect x="76" y="120" width="8" height="9" rx="1.5" fill="#F4B740" ${sw}/>`;
+    s += `<rect x="51" y="122" width="11" height="15" rx="2.5" fill="${INK}"/><circle cx="99" cy="133" r="4" fill="none" stroke="#F4B740" stroke-width="2"/><rect x="95" y="136" width="7" height="11" rx="2" fill="${INK}"/><path d="M102 136 l5 8" stroke="#C9CCD6" stroke-width="2.5" stroke-linecap="round"/>`;
+    s += headBase(k) + `<path d="M58 44 Q60 23 80 23 Q100 23 102 44 Q96 31 80 32 Q64 31 58 44 Z" fill="#2B1D14" ${sw}/><path d="M58 44 Q57 36 61 32" fill="none" stroke="#B8B8C4" stroke-width="3" stroke-linecap="round"/>`;
+    s += `<ellipse cx="72" cy="28" rx="7" ry="4" fill="${INK}"/><ellipse cx="88" cy="28" rx="7" ry="4" fill="${INK}"/><path d="M79 28 h2" ${sw}/>`;
+    s += `<circle cx="72" cy="47" r="2.7" fill="${INK}"/><circle cx="88" cy="47" r="2.7" fill="${INK}"/><path d="M69 56 Q75 52 80 55 Q85 52 91 56 Q85 59 80 57 Q75 59 69 56 Z" fill="#2B1D14"/><path d="M73 61 Q80 66 87 61" fill="none" ${sw} stroke-linecap="round"/>`;
+  }
+  if (id === "kumot") {
+    const k = SKIN.a;
+    s += `<defs><pattern id="kumotPat" width="26" height="26" patternUnits="userSpaceOnUse"><rect width="26" height="26" fill="#CFE3F5"/><rect width="7" height="26" fill="#86AEDB"/><rect x="16" width="2.5" height="26" fill="#E0483B" opacity=".75"/><circle cx="12" cy="9" r="4.2" fill="#E25A7A"/><circle cx="12" cy="9" r="1.6" fill="#F4B740"/><ellipse cx="16" cy="14" rx="3" ry="1.6" fill="#4E9A6B" transform="rotate(30 16 14)"/><circle cx="22" cy="21" r="3" fill="#E25A7A"/><circle cx="22" cy="21" r="1.1" fill="#F4B740"/></pattern></defs>`;
+    s += shadow() + limb("M71 130 L70 178", "#5A5F73", 11) + limb("M89 130 L90 178", "#5A5F73", 11);
+    s += `<path d="M57 186 Q57 178 70 178 Q78 178 78 186 Z" fill="#5A3A22" ${sw}/><path d="M82 186 Q82 178 90 178 Q103 178 103 186 Z" fill="#5A3A22" ${sw}/>`;
+    s += `<path d="M58 80 L45 100 L55 105 L62 90 Z" fill="url(#kumotPat)" ${sw}/><path d="M102 80 L115 100 L105 105 L98 90 Z" fill="url(#kumotPat)" ${sw}/>`;
+    s += limb("M50 104 L49 122", k, 8) + hand(49, 124, k) + limb("M110 104 L111 122", k, 8) + hand(111, 124, k);
+    s += `<path d="M55 80 Q80 71 105 80 L108 136 Q80 140 52 136 Z" fill="url(#kumotPat)" ${sw}/><path d="M70 76 L80 87 L73 91 Z" fill="#86AEDB" ${sw}/><path d="M90 76 L80 87 L87 91 Z" fill="#86AEDB" ${sw}/>`;
+    s += headBase(k) + `<path d="M57 46 Q58 22 82 22 Q104 24 103 46 Q96 30 76 32 Q66 34 57 46 Z" fill="#2B1D14" ${sw}/>` + face();
+    s += `<text x="112" y="30" font-family="Figtree, sans-serif" font-weight="700" font-size="13" fill="#EFE7D6" opacity=".85">z</text><text x="121" y="20" font-family="Figtree, sans-serif" font-weight="700" font-size="10" fill="#EFE7D6" opacity=".6">z</text>`;
+  }
+  if (id === "pageant") {
+    const k = SKIN.c, sparks = [[70, 118], [92, 132], [78, 150], [64, 174], [98, 176], [86, 104], [104, 186], [56, 186]];
+    s += shadow(42);
+    s += `<path d="M52 50 Q48 18 80 17 Q112 18 108 50 Q113 82 105 98 L55 98 Q47 82 52 50 Z" fill="#3A2418" ${sw}/>`;
+    s += limb("M58 86 L44 104 L58 119", k, 7) + hand(58, 119, k);
+    s += `<path d="M58 80 Q80 72 102 80 L100 128 Q96 150 92 162 Q112 177 117 188 L43 188 Q48 177 68 162 Q64 150 60 128 Z" fill="#F4B740" ${sw}/>`;
+    s += sparks.map(p => `<path d="M${p[0]} ${p[1] - 4} L${p[0] + 1.2} ${p[1] - 1.2} L${p[0] + 4} ${p[1]} L${p[0] + 1.2} ${p[1] + 1.2} L${p[0]} ${p[1] + 4} L${p[0] - 1.2} ${p[1] + 1.2} L${p[0] - 4} ${p[1]} L${p[0] - 1.2} ${p[1] - 1.2} Z" fill="#fff"/>`).join("");
+    s += `<path d="M93 77 L104 84 L65 135 L54 128 Z" fill="#fff" ${sw}/><text transform="translate(79 107) rotate(-53)" font-family="IM Fell English, Georgia, serif" font-size="8.5" text-anchor="middle" fill="#C0392B">Miss Argao</text>`;
+    s += limb("M102 84 L117 70 L113 46", k, 7) + hand(113, 44, k) + `<path d="M121 38 l5 -4 M123 46 l6 -1 M119 31 l3 -5" stroke="#EFE7D6" stroke-width="2" stroke-linecap="round" opacity=".8"/>`;
+    s += headBase(k, false) + `<path d="M58 44 Q64 25 84 25 Q99 27 103 44 Q92 33 78 35 Q66 37 58 44 Z" fill="#3A2418" ${sw}/>`;
+    s += `<path d="M66 27 L68 13 L74 21 L80 9 L86 21 L92 13 L94 27 Z" fill="#F4B740" ${sw}/><circle cx="80" cy="20" r="2.2" fill="#E0483B"/><circle cx="70" cy="22" r="1.5" fill="#5CC8C2"/><circle cx="90" cy="22" r="1.5" fill="#5CC8C2"/>`;
+    s += face("queen");
+  }
+  if (id === "liga") {
+    const k = SKIN.b, r = "#E0483B";
+    s += shadow() + limb("M71 152 L70 168", k, 9) + limb("M89 152 L90 168", k, 9) + limb("M70 164 L70 180", "#fff", 10) + limb("M90 164 L90 180", "#fff", 10) + sneakerL("#F4B740") + sneakerR("#F4B740");
+    s += `<path d="M53 124 L107 124 L110 157 L83 157 L80 143 L77 157 L50 157 Z" fill="${r}" ${sw}/><path d="M55 128 L52 154 M105 128 L108 154" stroke="#fff" stroke-width="2.5"/>`;
+    s += limb("M61 86 L51 116", k, 8) + hand(50, 118, k);
+    s += `<circle cx="117" cy="112" r="13" fill="#E8833A" ${sw}/><path d="M104 112 h26 M117 99 v26 M108 102 Q117 112 108 122 M126 102 Q117 112 126 122" fill="none" stroke="${INK}" stroke-width="1.6"/>`;
+    s += `<path d="M63 80 Q80 76 97 80 L106 128 L54 128 Z" fill="${r}" ${sw}/><path d="M69 80 L80 92 L91 80" fill="none" stroke="#fff" stroke-width="3"/><text x="80" y="117" text-anchor="middle" font-family="Figtree, sans-serif" font-weight="800" font-size="19" fill="#fff" stroke="${INK}" stroke-width=".8">8</text>`;
+    s += limb("M99 86 L108 104 L110 118", k, 8) + hand(110, 119, k);
+    s += `<path d="M63 74 Q80 86 97 74 L99 79 Q80 92 61 79 Z" fill="#fff" ${sw}/><path d="M63 77 L61 104 L69 104 L70 82 Z" fill="#fff" ${sw}/><path d="M97 77 L99 104 L91 104 L90 82 Z" fill="#fff" ${sw}/><path d="M62 98 h8 M62 101 h8 M90 98 h8 M90 101 h8" stroke="#3B6FD1" stroke-width="1.2"/><text transform="translate(66.5 90) rotate(90)" font-family="Figtree, sans-serif" font-size="5" font-weight="700" fill="#E0483B" text-anchor="middle">Good Morning</text>`;
+    s += headBase(k) + `<path d="M57 44 L60 28 L66 34 L70 23 L76 31 L81 21 L86 30 L92 23 L95 33 L101 28 L103 44 Q92 34 80 34 Q66 34 57 44 Z" fill="#1E1410" ${sw}/>` + face("grin");
+    s += `<path d="M107 30 Q111 37 107 40 Q103 37 107 30 Z" fill="#9FD3F5" ${sw}/>`;
+  }
+  if (id === "bagyo") {
+    const k = SKIN.a, y = "#F4D03F", drops = [[18, 30], [34, 70], [14, 110], [142, 90], [128, 140], [24, 150], [146, 40]];
+    s += drops.map(d => `<path d="M${d[0]} ${d[1]} q4 7 0 10 q-4 -3 0 -10 Z" fill="#9FD3F5" opacity=".8"/>`).join("");
+    s += shadow() + `<rect x="58" y="158" width="19" height="29" rx="5" fill="#2F6F4E" ${sw}/><rect x="83" y="158" width="19" height="29" rx="5" fill="#2F6F4E" ${sw}/>`;
+    s += hood(y);
+    s += `<path d="M56 80 Q80 70 104 80 L112 164 Q80 170 48 164 Z" fill="${y}" ${sw}/><path d="M80 82 L80 166" ${sw}/>` + [96, 114, 132, 150].map(cy => `<circle cx="85" cy="${cy}" r="2.2" fill="${INK}"/>`).join("");
+    s += limb("M58 86 L48 118", y, 11) + hand(47, 121, k) + limb("M102 86 L115 70", y, 11);
+    s += `<path d="M118 66 L120 24" ${sw}/><path d="M118 66 q-1 6 -6 5" fill="none" ${sw}/><path d="M99 8 L105 27 Q120 33 135 27 L141 8 L131 19 L120 5 L109 19 Z" fill="#E0483B" ${sw}/>` + hand(116, 68, k);
+    s += headBase(k, false) + hoodRim(y) + face("worried");
+  }
+  if (id === "hourglass") {
+    const k = SKIN.c, h = "#262433";
+    s += shadow(44);
+    s += `<path d="M64 126 L79 126 L80 181 L37 181 Q56 158 64 126 Z" fill="#8DB3DA" ${sw}/><path d="M81 126 L96 126 Q104 158 123 181 L80 181 Z" fill="#8DB3DA" ${sw}/><path d="M72 140 L66 176 M88 140 L95 176" stroke="#6E94BD" stroke-width="1.6"/>`;
+    s += `<path d="M30 189 Q28 176 44 174 Q60 173 66 181 L66 189 Z" fill="#fff" ${sw}/><path d="M94 189 L94 181 Q100 173 116 174 Q132 176 130 189 Z" fill="#fff" ${sw}/><path d="M31 186 h35 M94 186 h35" stroke="#A9A9B8" stroke-width="2.5"/>`;
+    s += limb("M63 85 L58 121", h, 8) + hand(58, 123, k) + limb("M97 85 L102 121", h, 8) + hand(102, 123, k);
+    s += `<path d="M62 79 Q80 74 98 79 L97 128 L63 128 Z" fill="${h}" stroke="#0B0A12" stroke-width="2.5" stroke-linejoin="round"/><path d="M66 78 Q80 90 94 78" fill="none" stroke="#3C3A4E" stroke-width="5"/><path d="M76 84 L75 98 M84 84 L85 98" stroke="#EFE7D6" stroke-width="1.6"/>`;
+    s += headBase(k) + `<path d="M57 46 Q56 21 80 21 Q104 21 103 46 L99 42 L95 46 L90 39 L84 45 L78 38 L72 45 L66 39 L61 46 Z" fill="#141018" ${sw}/>` + face("cool");
+  }
+  if (id === "whitelady") {
+    const k = SKIN.pale, w = "#F3F0FA";
+    s += shadow(26, .18);
+    s += `<path d="M53 46 Q51 17 80 17 Q109 17 107 46 L112 124 Q80 132 48 124 Z" fill="#14121E" ${sw}/>`;
+    s += `<path d="M58 80 Q80 72 102 80 L114 172 Q107 166 101 174 Q93 166 87 176 Q79 166 72 175 Q64 166 57 174 Q51 168 46 172 Z" fill="${w}" ${sw}/>`;
+    s += limb("M58 86 L47 122", w, 10) + hand(46, 125, k) + limb("M102 86 L113 122", w, 10) + hand(114, 125, k);
+    s += headBase(k, false);
+    s += `<circle cx="71" cy="50" r="3.4" fill="${INK}"/><circle cx="72" cy="49" r="1" fill="#fff"/><path d="M67 56 Q71 58 74 56" fill="none" stroke="#9B93B0" stroke-width="1.5"/><path d="M73 63 h6" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`;
+    s += `<path d="M78 24 Q104 22 104 50 L107 104 Q97 88 92 66 Q90 46 80 40 Q70 34 62 44 Q64 26 78 24 Z" fill="#14121E" ${sw}/>`;
+  }
+  return `<svg viewBox="0 0 160 200" role="img" aria-hidden="true">${s}</svg>`;
+}
+
+function renderFits() {
+  $("#fits").innerHTML = FITS.map(f => `<button type="button" class="fit" data-fit="${f.id}" aria-label="${esc(f.name + ". Belongs at: " + f.where + ". Says: " + f.say)}">
+      <span class="bubble" aria-hidden="true">${esc(f.say)}</span>
+      <span class="fit-art" aria-hidden="true">${fitArt(f.id)}</span>
+      <span class="fit-name" aria-hidden="true">${esc(f.name)}</span>
+      <span class="fit-where" aria-hidden="true"><b>Belongs at:</b> ${esc(f.where)}</span>
+    </button>`).join("");
+}
+function wireFits() {
+  const row = $("#fits");
+  row.addEventListener("click", function (e) {
+    const card = e.target.closest(".fit"); if (!card) return;
+    const was = card.classList.contains("say");
+    $$(".fit.say", row).forEach(c => c.classList.remove("say"));
+    if (!was) card.classList.add("say");
+    card.classList.remove("wobble"); void card.offsetWidth; card.classList.add("wobble");
+    setTimeout(() => card.classList.remove("wobble"), 700);
+    Sound.unlock(); Sound.stonato();
+  });
+  const step = () => Math.max(220, row.clientWidth * 0.8);
+  $("#fitsPrev").addEventListener("click", () => row.scrollBy({ left: -step(), behavior: reduced() ? "auto" : "smooth" }));
+  $("#fitsNext").addEventListener("click", () => row.scrollBy({ left: step(), behavior: reduced() ? "auto" : "smooth" }));
+}
+
+/* ================================================================
    Boot
    ================================================================ */
 (function boot() {
@@ -1500,7 +1736,7 @@ function hideTips() { $$(".tip.show").forEach(t => t.classList.remove("show")); 
   $("#footOrg").textContent = "Questions about the party? Message " + CONFIG.ORGANIZER + ".";
   $("#soundBtn").setAttribute("aria-pressed", String(Sound.on));
   $("#soundLbl").textContent = Sound.on ? "Sound on" : "Sound off";
-  drawHero(); renderLegend(); renderForm(); renderResults(); wire();
+  drawHero(); renderLegend(); renderForm(); renderResults(); renderFits(); wire(); wireFits();
   refresh(true);
 })();
 </script>
