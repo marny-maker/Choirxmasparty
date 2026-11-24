@@ -748,7 +748,8 @@ const API = (function () {
     let body = ""; try { body = await r.text(); } catch (e) {}
     const err = new Error("HTTP " + r.status + " " + body.slice(0, 200));
     err.status = r.status;
-    err.missingTable = /PGRST205|42P01|does not exist|Could not find the table/i.test(body);
+    err.oldTable = /PGRST204|42703|column .* does not exist|Could not find the '.*' column/i.test(body);   // table made with an older setup.sql
+    err.missingTable = !err.oldTable && /PGRST205|42P01|Could not find the table|relation .* does not exist/i.test(body);
     throw err;
   }
   async function list() {
@@ -1316,7 +1317,9 @@ async function save() {
     clearTimeout(S.scrollT);   // show the results, unless the person starts doing something else first
     S.scrollT = setTimeout(() => { S.scrollT = 0; $("#results").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }); }, 1100);
   } catch (e) {
-    $("#saveErr").textContent = e.missingTable ? "The voting table isn't set up yet, so this couldn't be saved. Let " + CONFIG.ORGANIZER + " know." : "Couldn't save just now. Check your connection and tap save again.";
+    $("#saveErr").textContent = e.missingTable ? "The voting table isn't set up yet, so this couldn't be saved. Let " + CONFIG.ORGANIZER + " know."
+      : e.oldTable ? "The voting table needs an update before votes can be saved. Let " + CONFIG.ORGANIZER + " know (organizer: run the latest setup.sql in Supabase)."
+      : "Couldn't save just now. Check your connection and tap save again.";
   } finally {
     S.saving = false; btn.disabled = false; renderForm();
   }
