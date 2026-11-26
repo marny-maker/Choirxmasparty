@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Deck the Dates: Christmas Party 2026</title>
-<meta name="description" content="Argao Minstrels, El Voicetas and Cantores Dei: tell us which nights you are free (Dec 26 to 29) and which venue you like. Results update live.">
+<meta name="description" content="Argao Minstrels, El Voicetas, Cantores Dei, and CTU-Argao Chorale: tell us which nights you are free (Dec 26 to 29) and which venue you like. Results update live.">
 <meta property="og:title" content="Deck the Dates: Christmas Party 2026">
-<meta property="og:description" content="Argao Minstrels, El Voicetas and Cantores Dei: pick your nights, pick a venue, request a song.">
+<meta property="og:description" content="Argao Minstrels, El Voicetas, Cantores Dei, and CTU-Argao Chorale: pick your nights, pick a venue, and request a song.">
 <meta property="og:type" content="website">
 <!-- Link preview image (og-thumbnail.png sits next to this file) -->
 <meta property="og:url" content="https://choirxmasparty.vercel.app/">
 <meta property="og:image" content="https://choirxmasparty.vercel.app/og-thumbnail.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Deck the Dates: Christmas Party 2026 for Argao Minstrels, El Voicetas and Cantores Dei">
+<meta property="og:image:alt" content="Deck the Dates: Christmas Party 2026 for Argao Minstrels, El Voicetas, Cantores Dei, and CTU-Argao Chorale">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#10173A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310173A'/%3E%3Cellipse cx='25' cy='45' rx='10' ry='7.5' transform='rotate(-22 25 45)' fill='%23F4B740'/%3E%3Cpath d='M33.5 43V12c6 3 13 6 13 15' stroke='%23F4B740' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -125,7 +125,8 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 /* final-call panel in the hero */
 .call{margin:8px auto 22px;max-width:580px;text-align:left;background:var(--night-2);border:1.5px solid var(--line);border-radius:18px;padding:16px 18px 18px}
 .call-k{margin:0 0 10px;font:italic 400 19px/1.2 var(--serif);color:var(--gold)}
-.ctally{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ctally{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:560px){.ctally{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .ctally li{border:1.5px solid var(--line);border-radius:12px;padding:10px 6px 9px;text-align:center}
 .ctally li.mine{border-color:var(--gold)}
 .ctally b{display:block;font:700 32px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--capiz)}
@@ -175,7 +176,8 @@ textarea.input{font-size:17px;min-height:88px;resize:vertical;line-height:1.45}
 .hint{font-size:14.5px;color:var(--capiz-2);margin:8px 0 0;min-height:1.3em}
 .hint.gold{color:var(--gold)}
 
-.choirpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 22px}
+.choirpick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 22px}
+@media (min-width:640px){.choirpick{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .choir{background:var(--night-2);border:1.5px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center;font:400 19px/1.15 var(--serif);transition:background-color .15s,border-color .15s,transform .1s}
 .choir:hover{border-color:var(--line-2)}
 .choir[aria-checked="true"]{background:var(--capiz);border-color:var(--capiz);color:#19142E}
@@ -338,7 +340,8 @@ textarea.input{font-size:17px;min-height:88px;resize:vertical;line-height:1.45}
 .trow .dyn{font:italic 700 18px/1 var(--serif);color:var(--gold);text-align:center}
 .trow .tn{text-align:right;font-weight:600}
 .roll{display:grid;gap:18px;margin-top:14px}
-@media (min-width:980px){.roll{grid-template-columns:repeat(3,minmax(0,1fr));width:min(1180px,calc(100vw - 48px));margin-left:calc(50% - min(590px,50vw - 24px))}}
+@media (min-width:700px){.roll{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1180px){.roll{grid-template-columns:repeat(4,minmax(0,1fr));width:min(1320px,calc(100vw - 48px));margin-left:calc(50% - min(660px,50vw - 24px))}}
 #roll{scroll-margin-top:64px}
 .rc-col{background:var(--night-2);border:1.5px solid var(--line);border-radius:16px;padding:14px 14px 6px;min-width:0}
 .rc-col h4{margin:0 0 6px;font:400 22px/1.15 var(--serif);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
@@ -482,13 +485,13 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       <div class="step-head">
         <span class="mark" aria-hidden="true">A</span>
         <div><p class="tempo">Andante</p><h2 id="h-a">Who's singing?</h2>
-        <p class="lede">Your name, your choir and your voice part. Tap a part to hear its pitch pipe.</p></div>
+        <p class="lede">Your name, your choir, and your voice part. Tap a part to hear its pitch pipe.</p></div>
       </div>
       <div class="cues" id="cues" hidden>
         <p class="cues-k" id="cuesK"></p>
         <dl>
           <div><dt>Voting on nights and venue</dt><dd id="cueVote"></dd></div>
-          <div><dt>Signing up for the party</dt><dd><b>Open until party day.</b> Missed the vote? You can still add your name, voice part, look and pledge.</dd></div>
+          <div><dt>Signing up for the party</dt><dd><b>Open until party day.</b> Missed the vote? You can still add your name, voice part, look, and pledge.</dd></div>
         </dl>
       </div>
       <div class="field">
@@ -574,7 +577,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       <div class="step-head">
         <span class="mark" aria-hidden="true">E</span>
         <div><p class="tempo">Cantabile</p><h2 id="h-e">A few last notes</h2>
-        <p class="lede">Optional, but they help us plan rooms, food and the videoke list.</p></div>
+        <p class="lede">Optional, but they help us plan rooms, food, and the videoke list.</p></div>
       </div>
       <div class="grid2">
         <div><p class="flabel" id="adLbl">Adults coming with you</p>
@@ -657,7 +660,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
         <div>
           <p class="tempo">Stonato</p>
           <h2 id="h-dc" style="font:400 clamp(2rem,6.6vw,2.5rem)/1.05 var(--serif);margin:0">Dress code: Wrong Attire for the Wrong Event</h2>
-          <p class="lede">Come dressed for anywhere but a Christmas party. Stonato means out of tune, and that's the whole idea. Here are a few ideas to get you started, from Pinoy memes to festivals, jobs and costumes. Tap one to hear how off-key it is, then <a href="#step-d">claim your look in step <span data-stepref="step-d">D</span></a>.</p>
+          <p class="lede">Come dressed for anywhere but a Christmas party. Stonato means out of tune, and that's the whole idea. Here are a few ideas to get you started, from Pinoy memes to festivals, jobs, and costumes. Tap one to hear how off-key it is, then <a href="#step-d">claim your look in step <span data-stepref="step-d">D</span></a>.</p>
         </div>
         <div class="dress-nav"><button type="button" id="fitsPrev" aria-label="Previous outfits">&lsaquo;</button><button type="button" id="fitsNext" aria-label="More outfits">&rsaquo;</button></div>
       </div>
@@ -719,11 +722,13 @@ const CONFIG = {
   POLL_MS: 12000
 };
 
-/* The three choirs. The ids are saved with each vote, so don't change them once voting starts. */
+/* The four choirs. The ids are saved with each vote, so don't change them once voting starts.
+   Their chords climb C, E, G, and high C: tap through all four and you've played one big C major chord. */
 const CHOIRS = [
   { id: "minstrels", name: "Argao Minstrels", short: "Minstrels", arp: [60, 64, 67, 72] },
   { id: "voicetas",  name: "El Voicetas",     short: "Voicetas",  arp: [64, 68, 71, 76] },
-  { id: "cantores",  name: "Cantores Dei",    short: "Cantores",  arp: [67, 71, 74, 79] }
+  { id: "cantores",  name: "Cantores Dei",    short: "Cantores",  arp: [67, 71, 74, 79] },
+  { id: "chorale",   name: "CTU-Argao Chorale", short: "Chorale",  arp: [72, 76, 79, 84] }
 ];
 const choirById = id => CHOIRS.find(c => c.id === id);
 
@@ -858,7 +863,11 @@ const voteKey = (name, choir) => (choir || "none") + "|" + nameLower(name);   //
 const peso = n => "₱" + Math.round(n).toLocaleString("en-PH");
 const reduced = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function hash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
-function listJoin(a) { if (a.length < 2) return a.join(""); return a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+function listJoin(a) {   // Oxford comma: "A and B", "A, B, and C"
+  if (a.length < 2) return a.join("");
+  if (a.length === 2) return a[0] + " and " + a[1];
+  return a.slice(0, -1).join(", ") + ", and " + a[a.length - 1];
+}
 function plural(n, one, many) { return n + " " + (n === 1 ? one : many); }
 const dateById = id => DATES.find(d => d.id === id);
 const venueById = id => VENUES.find(v => v.id === id);
@@ -1024,7 +1033,7 @@ const API = (function () {
     let body = ""; try { body = await r.text(); } catch (e) {}
     const err = new Error("HTTP " + r.status + " " + body.slice(0, 200));
     err.status = r.status;
-    err.oldTable = /PGRST204|42703|column .* does not exist|Could not find the '.*' column/i.test(body);   // table made with an older setup.sql
+    err.oldTable = /PGRST204|42703|column .* does not exist|Could not find the '.*' column|choir_xmas_votes_choir_check/i.test(body);   // table made with an older setup.sql
     err.missingTable = !err.oldTable && /PGRST205|42P01|Could not find the table|relation .* does not exist/i.test(body);
     throw err;
   }
@@ -1351,7 +1360,7 @@ function choirCounts(list) {
   return CHOIRS.map(c => [c, list.filter(v => v.choir === c.id).length]);
 }
 function choirBreak(list) {
-  return choirCounts(list).map(x => x[1] + " " + x[0].short).join(", ");
+  return choirCounts(list).filter(x => x[1]).map(x => x[1] + " " + x[0].short).join(", ");   // skip choirs with no one yet
 }
 function renderSummary() {
   const n = S.votes.length;
@@ -1862,7 +1871,7 @@ function askPledge(row) {
     if (row.pledge_method === "cash") what.push("message Trisha or Ahyizse to hand over your cash");
     if (row.pledge_food) what.push("bring your " + row.pledge_food + " on the night");
     $("#pdSum").innerHTML = pledgeTags(row);
-    $("#pdBody").innerHTML = `Every peso and every plate keeps three choirs fed, in tune and very merry. Once you confirm, this goes up beside your name in the roll call, and all you have to do is <b>${esc(listJoin(what))}</b>.`;
+    $("#pdBody").innerHTML = `Every peso and every plate keeps four choirs fed, in tune, and very merry. Once you confirm, this goes up beside your name in the roll call, and all you have to do is <b>${esc(listJoin(what))}</b>.`;
     let done = false;
     const finish = ok => { if (done) return; done = true; closeDlg(dlg); dlg.removeEventListener("close", onClose); resolve(ok); };
     const onClose = () => finish(false);
@@ -1881,7 +1890,7 @@ function showThanks(row) {
   if (row.pledge_food) reminders.push("See you and your " + esc(row.pledge_food) + " at the party!");
   $("#toast").classList.remove("show");
   $("#tdTitle").textContent = "Salamat kaayo, " + first + "!";
-  $("#tdBody").innerHTML = "Your pledge is in, and it's already up beside your name. You just made this Christmas a little louder for all three choirs. " + reminders.join(" ");
+  $("#tdBody").innerHTML = "Your pledge is in, and it's already up beside your name. You just made this Christmas a little louder for all four choirs. " + reminders.join(" ");
   openDlg(dlg);
   setTimeout(() => { Sound.cadence(); flyNotes($("#tdOk")); }, 450);
   $("#tdOk").onclick = function () { closeDlg(dlg); $("#roll").scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" }); };
@@ -2287,7 +2296,7 @@ function wireFits() {
    Boot
    ================================================================ */
 (function boot() {
-  $("#trio").textContent = listJoin(CHOIRS.map(c => c.name.replace(/ /g, "\u00a0")));   // keep each choir name on one line
+  $("#trio").innerHTML = listJoin(CHOIRS.map(c => `<span class="nw">${esc(c.name)}</span>`));   // keep each choir name on one line
   $("#footOrg").textContent = "Questions about the party? Message " + CONFIG.CONTACTS + ".";
   $("#soundBtn").setAttribute("aria-pressed", String(Sound.on));
   $("#soundLbl").textContent = Sound.on ? "Sound on" : "Sound off";
