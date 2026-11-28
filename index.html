@@ -113,6 +113,39 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .rsvp-b[data-go="0"][aria-pressed="true"]{border-color:var(--capiz-2);background:rgba(239,231,214,.08)}
 .headcount{margin:10px 0 0;font-size:15px;color:var(--capiz-2)}
 .headcount b{color:var(--capiz)}
+/* after the vote: event first, vote results tucked away */
+.after-only{display:none}
+.after-vote .after-only{display:block}
+.after-vote .vote-only,.after-vote .vote-only-h{display:none}
+.after-vote #roll{scroll-margin-top:120px}
+.tbc{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.tbc .call-k{color:#F2C14E}
+.tbc-line{display:flex;align-items:baseline;gap:10px;margin:0}
+.tbc-line b{font:700 32px/1 var(--sans);font-variant-numeric:tabular-nums;color:#F2C14E}
+.tbc-line span{color:var(--capiz-2);font-size:15px}
+.rc-tbc{font-size:13px;color:#F2C14E;border:1px dashed rgba(242,193,78,.75);border-radius:6px;padding:2px 6px;white-space:nowrap}
+.modal-in .cf-later{margin:16px 0 0;text-align:center;font-size:15px}
+#cfErr:empty{display:none}
+/* "How the vote went": one folded panel at the bottom, with three folded parts inside */
+.record{padding:0 0 48px}
+.rec{border:1.5px solid var(--line-2);border-radius:16px;background:var(--night-2)}
+.rec summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px}
+.rec summary::-webkit-details-marker{display:none}
+.rec summary::after{content:"";flex:none;margin-left:auto;width:8px;height:8px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.rec details[open] > summary::after,.rec[open] > summary::after{transform:translateY(2px) rotate(-135deg)}
+.rec > summary{padding:16px 18px;border-radius:14px}
+.rec-t{display:block;font:400 22px/1.15 var(--serif);color:var(--capiz)}
+.rec-s{display:block;margin-top:3px;font-size:14px;color:var(--capiz-2)}
+.rec-body{padding:0 18px 6px}
+.rec-part{border-top:1px solid var(--line)}
+.rec-part > summary{padding:13px 0;font-size:16px;font-weight:600;color:var(--capiz)}
+.rec-in{padding:0 0 18px}
+#voteRecord .subh{display:none}
+#voteRecord .summary{margin:0;font-size:15px;color:var(--capiz-2)}
+#voteRecord .best{margin-top:12px}
+#voteRecord .best .cost{display:none}
+#voteRecord .best .lbl{display:none}
+#voteRecord .system:first-child{margin-top:12px}
 /* the two deadlines, at the top of the form */
 .cues{margin:0 0 26px;border:1.5px solid var(--line-2);border-radius:14px;padding:14px 16px;background:var(--night-2)}
 .cues-k{margin:0 0 10px;font:italic 400 19px/1.25 var(--serif);color:var(--gold)}
@@ -480,7 +513,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
 <header class="topbar">
   <a class="brand" href="#top">Deck the Dates</a>
   <div class="spacer"></div>
-  <div class="me" id="me"><span>Voting as <b id="meName"></b></span><button class="linkbtn" id="switchBtn" type="button">Not you?</button></div>
+  <div class="me" id="me"><span><span id="meLbl">Voting as</span> <b id="meName"></b></span><button class="linkbtn" id="switchBtn" type="button">Not you?</button></div>
   <button class="sound" id="soundBtn" type="button" aria-pressed="true">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="mute" d="m16 9 6 6m0-6-6 6"/></svg>
     <span class="lbl" id="soundLbl">Sound on</span>
@@ -499,7 +532,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
     <p class="trio" id="trio"></p>
     <svg class="hero-staff" id="heroStaff" viewBox="0 0 660 132" role="img" aria-label="The opening notes of Joy to the World"></svg>
     <div class="call" id="call" hidden></div>
-    <p class="intro">Pick the nights you can make it between Dec 26 and 29, tell us which venue you like, and request a song. Everyone's answers show up live at the bottom of the page.</p>
+    <p class="intro" id="heroIntro">Pick the nights you can make it between Dec 26 and 29, tell us which venue you like, and request a song. Everyone's answers show up live at the bottom of the page.</p>
     <p class="theme">Theme: <a href="#dresscode">Wrong Attire for the Wrong Event</a></p>
     <div class="hero-actions">
       <a class="btn btn-gold" href="#step-a">Start voting</a>
@@ -606,7 +639,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       <div class="step-head">
         <span class="mark" aria-hidden="true">E</span>
         <div><p class="tempo">Cantabile</p><h2 id="h-e">A few last notes</h2>
-        <p class="lede">Optional, but they help us plan rooms, food, and the videoke list.</p></div>
+        <p class="lede">Optional, but they help us plan the food and the videoke list.</p></div>
       </div>
       <div class="grid2">
         <div><p class="flabel" id="adLbl">Adults coming with you</p>
@@ -659,14 +692,14 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
   </section>
 
   <section class="results" id="results" aria-labelledby="h-r">
-    <div class="wrap">
+    <div class="wrap vote-only" id="vrHead">
       <p class="tempo">Tutti</p>
       <h2 id="h-r">Where everyone stands</h2>
       <div id="shareCard"></div>
       <p class="summary" id="summary">Loading votes...</p>
       <div id="best"></div>
     </div>
-    <div class="wrap wide">
+    <div class="wrap wide vote-only" id="vrScore">
       <div style="max-width:720px">
         <h3 class="subh">The score</h3>
         <p class="subp">Every vote is a note on that night's staff, in the singer's own range. Tap play to hear how full each night sounds.</p>
@@ -674,10 +707,13 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       </div>
       <div id="score"></div>
     </div>
-    <div class="wrap">
+    <div class="wrap vote-only" id="vrVenues">
       <h3 class="subh">Venue votes</h3>
       <div class="tally" id="tally"></div>
-      <h3 class="subh">Roll call</h3>
+    </div>
+    <div class="wrap">
+      <div class="after-only"><p class="tempo">Ensemble</p><h2 id="h-who">Who's coming</h2></div>
+      <h3 class="subh vote-only-h">Roll call</h3>
       <div class="roll" id="roll"></div>
       <h3 class="subh">The setlist</h3>
       <p class="subp">Song requests so far.</p>
@@ -731,6 +767,16 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
     <div class="modal-actions"><button class="btn" id="pdNo" type="button">Let me think</button><button class="btn btn-gold" id="pdYes" type="button">Yes, count me in!</button></div>
   </div>
 </dialog>
+<dialog class="modal" id="confirmDlg" aria-labelledby="cfTitle">
+  <div class="modal-in">
+    <p class="tempo">Da capo</p>
+    <h3 id="cfTitle">Can you make it?</h3>
+    <p id="cfBody"></p>
+    <p class="err" id="cfErr" role="alert"></p>
+    <div class="modal-actions"><button class="btn" id="cfNo" type="button">Sadly, I can't</button><button class="btn btn-gold" id="cfYes" type="button">Yes, count me in!</button></div>
+    <p class="cf-later"><button type="button" class="linkbtn" id="cfLater">Ask me later</button></p>
+  </div>
+</dialog>
 <dialog class="modal" id="moveDlg" aria-labelledby="mvTitle">
   <div class="modal-in">
     <p class="tempo">Modulation</p>
@@ -763,6 +809,9 @@ const CONFIG = {
   // After the deadline the top of the page shows the leading night + venue from the votes.
   // To announce the organizers' official pick instead, fill these in, e.g. { date: "d28", venue: "bulasa" }
   FINAL_PICK: { date: "", venue: "" },
+  // After the vote, the vote results (best match, the score, venue votes) live in a folded
+  // "How the vote went" panel at the very bottom. Set to false to hide it completely.
+  SHOW_VOTE_RECORD: true,
   SITE_URL: "https://choirxmasparty.vercel.app/",
   INVITE: "I'm in for the Choir Christmas Party this year! Votes close Saturday, vote na para ma-count ka.",
   // First card in the dress-code row: a TikTok that plays (muted) while it's on screen. Blank id hides it.
@@ -1428,12 +1477,13 @@ function choirBreak(list) {
   return choirCounts(list).filter(x => x[1]).map(x => x[1] + " " + x[0].short).join(", ");   // skip choirs with no one yet
 }
 function renderSummary() {
-  const n = S.votes.length;
+  const list = closed() ? votedVotes() : S.votes, n = list.length;
+  renderRecordSub();
   if (!n) { $("#summary").textContent = S.error ? "Votes couldn't load. They'll appear here once the connection is back." : S.loaded ? "No votes yet. Be the first voice: scroll up and add yours." : "Loading votes..."; return; }
-  const bits = choirCounts(S.votes).filter(x => x[1]).map(x => x[1] + " from " + x[0].name);
-  const none = S.votes.filter(v => !choirById(v.choir)).length;
+  const bits = choirCounts(list).filter(x => x[1]).map(x => x[1] + " from " + x[0].name);
+  const none = list.filter(v => !choirById(v.choir)).length;
   if (none) bits.push(none + " with no choir picked");
-  $("#summary").textContent = (closed() ? plural(n, "sign-up", "sign-ups") : plural(n, "vote", "votes")) + " so far: " + listJoin(bits) + ".";
+  $("#summary").textContent = plural(n, "vote", "votes") + (closed() ? " came in before voting closed: " : " so far: ") + listJoin(bits) + ".";
 }
 function renderBest() {
   const box = $("#best");
@@ -1451,10 +1501,11 @@ function renderBest() {
     return;
   }
   const b = withFans[0];
-  const runners = withFans.slice(1, 4).map(c => `<li><b>${c.d.label} at ${esc(c.v.short)}</b>: ${c.fans.length} of ${c.free.length} free that night like it${c.confirmed ? "" : " (night not confirmed yet)"}</li>`).join("");
+  const done = closed();
+  const runners = withFans.slice(1, 4).map(c => `<li><b>${c.d.label} at ${esc(c.v.short)}</b>: ${c.fans.length} of ${c.free.length} free that night ${done ? "liked" : "like"} it${c.confirmed || done ? "" : " (night not confirmed yet)"}</li>`).join("");
   box.innerHTML = `<div class="best"><p class="lbl">${closed() ? "Where the votes landed" : "Best match so far"}</p>
     <p class="big">${b.d.label} at ${esc(b.v.name)}</p>
-    <p class="why">${plural(b.free.length, "person is", "people are")} free that night (${choirBreak(b.free)}), and ${b.fans.length === b.free.length ? "all of them" : b.fans.length + " of them"} picked this venue.${b.confirmed ? "" : " We're still confirming this venue has that night open."}</p>
+    <p class="why">${plural(b.free.length, done ? "person was" : "person is", done ? "people were" : "people are")} free that night (${choirBreak(b.free)}), and ${b.fans.length === b.free.length ? "all of them" : b.fans.length + " of them"} picked this venue.${b.confirmed || done ? "" : " We're still confirming this venue has that night open."}</p>
     ${costLine(b) ? `<p class="cost">${esc(costLine(b))}</p>` : ""}
     <div class="row"><button class="btn btn-sm" type="button" data-cadence="${b.d.id}">Hear it resolve</button></div>
     ${runners ? `<ul class="runners">${runners}</ul>` : ""}</div>`;
@@ -1571,7 +1622,7 @@ function playDate(id) {
   setTimeout(() => sys && $$(".note.sing", sys).forEach(n => n.classList.remove("sing")), ms + 100);
 }
 function renderTally() {
-  const n = activeVotes().length;
+  const n = (closed() ? votedVotes() : S.votes).filter(v => !v.cant_make_it).length;
   $("#tally").innerHTML = VENUES.map(function (v) {
     const c = S.votes.filter(x => (x.venues || []).includes(v.id)).length;
     const r = n ? c / n : 0;
@@ -1583,7 +1634,8 @@ function rollRow(v, night) {
   const p = PARTS[v.voice_part] || PARTS.X;
   const part = `<span class="rc-part" style="--c:${p.css}" title="${p.name}">${v.voice_part && v.voice_part !== "X" ? v.voice_part : "\u266A"}</span>`;
   const nights = night !== undefined
-    ? (isComing(v, night) ? `<span class="rc-date">${night ? dateById(night).label.replace("Dec ", "") : "Coming"}</span>` : `<span class="rc-rest">Can't make it</span>`)
+    ? (isComing(v, night) ? `<span class="rc-date">${night ? dateById(night).label.replace("Dec ", "") : "Coming"}</span>`
+      : stillToConfirm(v, night) ? `<span class="rc-tbc">Still to confirm</span>` : `<span class="rc-rest">Can't make it</span>`)
     : v.cant_make_it ? `<span class="rc-rest">Resting this one</span>` : (v.dates || []).map(id => `<span class="rc-date">${dateById(id).label.replace("Dec ", "")}</span>`).join("");
   const money = v.pledge_method === "gcash" ? `<span class="ptag gcash">GCash</span>` : v.pledge_method === "cash" ? `<span class="ptag cash">Cash</span>` : "";
   const food = v.pledge_food ? `<span class="rc-food">${esc(v.pledge_food)}</span>` : "";
@@ -1592,7 +1644,7 @@ function rollRow(v, night) {
 }
 function renderRoll() {
   const night = closed() ? finalNight() : undefined;
-  const order = v => ((night !== undefined ? !isComing(v, night) : v.cant_make_it) ? 10 : 0) + PART_ORDER.indexOf(PARTS[v.voice_part] ? v.voice_part : "X");
+  const order = v => (night !== undefined ? (isComing(v, night) ? 0 : stillToConfirm(v, night) ? 5 : 10) : (v.cant_make_it ? 10 : 0)) + PART_ORDER.indexOf(PARTS[v.voice_part] ? v.voice_part : "X");
   const cols = CHOIRS.map(c => [c.name, S.votes.filter(v => v.choir === c.id)]);
   const lost = S.votes.filter(v => !choirById(v.choir));
   if (lost.length) cols.push(["No choir picked", lost]);
@@ -1633,6 +1685,7 @@ function renderLegend() {
 function renderResults() {
   renderSummary(); renderBest(); renderScore(); renderTally(); renderRoll(); renderSetlist(); renderNotes();
   renderCall(); renderShareCard(); renderCountdown();
+  maybeAskConfirm(S.meKey && voteByKey(S.meKey));
 }
 
 /* ================================================================
@@ -1791,15 +1844,17 @@ function renderCountdown() {
   if (!DEADLINE) { bar.hidden = true; return; }
   const t = Date.now(), st = stageAt(t), left = DEADLINE - t;
   const two = (l, sh) => `<span class="cd-l">${l}</span><span class="cd-s">${sh}</span>`;
+  const party = st === "fine" && S.loaded ? leader() : null;
   const msgs = {
     mf: two(`<b>Date &amp; venue</b> votes close <b>${dayLabel(DEADLINE)}</b>. Sign-ups stay open till the party.`, `<b>Date &amp; venue</b> vote ends Sat`),
     f: two(`<b>One day left</b> to vote on the date &amp; venue. Sign-ups stay open till the party.`, `<b>1 day left</b> for date &amp; venue`),
     ff: two(`<b>Last day</b> to vote on the date &amp; venue! Closes tonight at 11:59 PM.`, `<b>Last day</b> for date &amp; venue!`),
     coda: two(`<b>Final bars!</b> Date &amp; venue voting closes in`, `<b>Final bars!</b> Vote closes in`),
-    fine: two(`<b>Date &amp; venue voting is closed.</b> Sign-ups stay open until the party!`, `<b>Vote closed.</b> Sign-ups still open!`)
+    fine: party ? two(`<b>See you ${party.d.label}${party.v ? " at " + esc(party.v.short) : ""}!</b> Sign-ups are open.`, `<b>See you ${party.d.label}!</b>`)
+      : two(`<b>The date is set.</b> Sign-ups are open!`, `<b>Sign-ups are open!</b>`)
   };
-  const btn = st === "fine" ? (iVoted() ? "See the verdict" : "Sign up now") : iVoted() ? "Tag a choirmate" : "Vote now";
-  const sig = st + "|" + btn;
+  const btn = st === "fine" ? (iVoted() ? "See the details" : "Sign up now") : iVoted() ? "Tag a choirmate" : "Vote now";
+  const sig = st + "|" + btn + "|" + (party ? party.d.id + (party.v ? party.v.id : "") : "");
   if (bar.dataset.sig !== sig) {
     const was = bar.dataset.s;
     bar.dataset.sig = sig; bar.dataset.s = st; bar.hidden = false;
@@ -1809,7 +1864,12 @@ function renderCountdown() {
     if (was && was !== st) { renderForm(); renderResults(); }
     syncHeader();
   }
-  $("#cdTime").textContent = st === "fine" ? "" : timeLeft(left, st);
+  $("#cdTime").textContent = st === "fine" ? partyDays(party) : timeLeft(left, st);
+}
+function partyDays(L) {
+  if (!L) return "";
+  const start = Date.parse("2026-12-" + L.d.id.slice(1) + "T00:00:00+08:00"), d = Math.ceil((start - Date.now()) / 864e5);
+  return d > 1 ? d + " days to go" : d === 1 ? "Tomorrow!" : "Party time!";
 }
 function syncHeader() { document.documentElement.style.scrollPaddingTop = ($(".topbar").offsetHeight + 12) + "px"; }
 function leader() {
@@ -1841,18 +1901,16 @@ function renderCall() {
   if (S.loaded) S.tallyPrev = counts;
   const rollBtn = `<a class="btn btn-sm" href="#roll" data-roll>See the full roll call</a>`;
   const L = leader();
-  let verdict;
-  if (!L) verdict = `<p class="v-why">No nights got any votes. The organizers will reach out in the group chat.</p>`;
-  else {
-    const where = L.v ? `${L.d.label} at ${esc(L.v.name)}` : L.d.label;
-    const why = plural(L.free.length, "person is", "people are") + " free that night (" + choirBreak(L.free) + ")" +
-      (L.v && L.fans.length ? ", and " + (L.fans.length === L.free.length ? "all of them" : L.fans.length + " of them") + " picked this venue." : ".");
-    verdict = `<p class="v-big">${where}</p><p class="v-why">${why}</p>
-      <p class="v-note">${L.official ? "It's official. See you there!" : "That's where the votes landed. The organizers are confirming the booking now, so watch your group chat for the details."}</p>`;
-  }
-  box.innerHTML = `<p class="call-k">Fine</p><h2 class="v-h" id="verdict">The verdict</h2>${verdict}
+  const head = !L
+    ? `<p class="call-k">Save the date</p><h2 class="v-h" id="verdict">Coming soon</h2><p class="v-note">The organizers will post the date and place here.</p>`
+    : `<p class="call-k">Save the date</p><h2 class="v-h" id="verdict">${L.d.label}</h2>
+       <p class="v-big">${L.v ? esc(L.v.name) : "Venue to be announced"}</p><p class="v-why">${esc(L.d.nights)}, overnight</p>
+       <p class="v-note">${L.official ? "It's official. See you there!" : "The organizers are confirming the booking now, so watch your group chat for the details."}</p>`;
+  const tbc = S.votes.filter(v => stillToConfirm(v, night));
+  box.innerHTML = `${head}
     <p class="call-k" style="margin-top:4px">Coming so far</p>${tally}
     <p class="headcount">${headLine(counted)}</p>
+    <div class="tbc"><p class="call-k">Still to confirm</p><p class="tbc-line"><b>${S.loaded ? tbc.length : "&ndash;"}</b><span>${tbc.length ? (tbc.length === 1 ? "member voted for another night and hasn't said yet." : "members voted for another night and haven't said yet.") : "Everyone has confirmed. Nice!"}</span></p></div>
     <div class="call-row"><p>${iVoted() ? "You're on the list. See you there!" : "Not on the list yet? Sign-ups stay open until the party."}</p>${iVoted() ? rollBtn : `<button class="btn btn-gold btn-sm" type="button" data-signup>Sign up</button>`}</div>`;
 }
 function headLine(list) {
@@ -1862,9 +1920,9 @@ function headLine(list) {
 }
 function renderCues() {
   const box = $("#cues");
-  if (!DEADLINE) { box.hidden = true; return; }
-  box.hidden = false;
   const done = closed();
+  if (!DEADLINE || done) { box.hidden = true; return; }
+  box.hidden = false;
   $("#cuesK").textContent = done ? "The date and venue vote is closed, but you can still join" : "Saturday is only for the date and venue vote";
   $("#cueVote").textContent = done ? "Closed. See the date and place in step " + stepL("step-party") + " below." : "Closes " + dayLabel(DEADLINE) + " at 11:59 PM";
   $$(".vclose").forEach(x => x.textContent = done ? " This vote closed on Saturday; the date and venue are at the top of the page." : " This vote closes " + dayLabel(DEADLINE) + " at 11:59 PM.");
@@ -1881,9 +1939,48 @@ function applyMode() {
   $$("section.step").filter(x => !x.hidden).forEach((x, i) => { x.querySelector(".mark").textContent = String.fromCharCode(65 + i); });
   $$("[data-stepref]").forEach(x => x.textContent = stepL(x.dataset.stepref));
   $(".hero-actions .btn-gold").textContent = after ? "Sign up" : "Start voting";
-  if (after) renderParty();
+  document.body.classList.toggle("after-vote", after);
+  if (after) {
+    $("#heroIntro").textContent = "The date is set! Sign up if you haven't yet, claim your look, and chip in for the party. Who's coming shows up live at the bottom of the page.";
+    $("#voters > p").textContent = "Already signed up? Tap your name to change your answers.";
+    $("#meLbl").textContent = "Signed up as";
+    $("#results").setAttribute("aria-labelledby", "h-who");
+    if (CONFIG.SHOW_VOTE_RECORD && !$("#voteRecord")) buildRecord();
+    renderParty();
+  }
+}
+// The vote results, folded away at the very bottom: one panel, three parts inside, all closed until tapped
+function buildRecord() {
+  const sec = document.createElement("section");
+  sec.className = "record"; sec.id = "voteRecord"; sec.setAttribute("aria-label", "How the vote went");
+  sec.innerHTML = `<div class="wrap wide"><details class="rec" id="recAll">
+    <summary><span><span class="rec-t">How the vote went</span><span class="rec-s" id="recSub"></span></span></summary>
+    <div class="rec-body">
+      <details class="rec-part" id="recTop"><summary>Where the votes landed</summary><div class="rec-in" id="recTopIn"></div></details>
+      <details class="rec-part" id="recScore"><summary>The score, night by night</summary><div class="rec-in" id="recScoreIn"></div></details>
+      <details class="rec-part" id="recVenues"><summary>Venue votes</summary><div class="rec-in" id="recVenuesIn"></div></details>
+    </div></details></div>`;
+  $("#notes").after(sec);
+  $("#recTopIn").append($("#summary"), $("#best"));
+  ["#vrScore", "#vrVenues"].forEach(id => { $(id).className = ""; });
+  $("#recScoreIn").append($("#vrScore")); $("#recVenuesIn").append($("#vrVenues"));
+  wireResults(sec);
+  // the staves size themselves to the space they get, so draw them again once they can be seen
+  ["#recAll", "#recScore"].forEach(id => $(id).addEventListener("toggle", function () { if ($("#recAll").open && $("#recScore").open) renderScore(); }));
+  renderRecordSub();
+}
+function votedVotes() { return S.votes.filter(v => (v.dates || []).length || v.cant_make_it); }   // everyone who voted before it closed
+function renderRecordSub() {
+  const el = $("#recSub"); if (!el) return;
+  const n = votedVotes().length;
+  el.textContent = S.loaded ? "Voting closed " + new Date(DEADLINE).toLocaleDateString("en-US", Object.assign({ month: "short", day: "numeric" }, MNL)) + " with " + plural(n, "vote", "votes") + "." : "Loading...";
 }
 function finalNight() { const L = leader(); return L ? L.d.id : ""; }
+// voted only for other nights and hasn't answered "are you coming?" yet
+function stillToConfirm(v, night) {
+  if (night === undefined) night = finalNight();
+  return !!v && v.going == null && !v.cant_make_it && !!night && !(v.dates || []).includes(night);
+}
 function isComing(v, night) {
   if (v.going === true) return true;
   if (v.going === false) return false;
@@ -1902,7 +1999,7 @@ function renderParty() {
   const sig = L ? [L.d.id, L.v ? L.v.id : "", L.official ? 1 : 0].join("|") : "none";
   if (S.partySig === sig) return;
   S.partySig = sig;
-  $("#partyLede").textContent = L && L.official ? "It's official! Signing up from here on means you're joining us on this night." : "The votes are in! Signing up from here on means you're joining us on this night.";
+  $("#partyLede").textContent = L && L.official ? "It's official! Signing up means you're joining us on this night." : "The date is set! Signing up means you're joining us on this night.";
   if (!L) { $("#party").innerHTML = `<div class="pcard"><div class="pc-body"><p class="pc-where">Coming soon</p><p class="pc-kind">The organizers will post the date and place here. You can still sign up below.</p></div></div>`; return; }
   const v = L.v;
   const photo = v && v.photos && v.photos[0] ? `<img src="${esc(v.photos[0].src)}" alt="${esc(v.name + ": " + v.photos[0].cap)}" referrerpolicy="no-referrer" loading="lazy">` : "";
@@ -1912,7 +2009,7 @@ function renderParty() {
     <p class="pc-when">${L.d.label}</p><p class="pc-nights">${esc(L.d.nights)}, overnight</p>
     <p class="pc-where">${v ? esc(v.name) : "Venue to be announced"}</p>${v && v.kind ? `<p class="pc-kind">${esc(v.kind)}</p>` : ""}
     ${rates}${links}
-    <p class="pc-status">${L.official ? "It's official. See you there!" : "That's where the votes landed. The organizers are confirming the booking now, so watch your group chat for the details."}</p>
+    <p class="pc-status">${L.official ? "It's official. See you there!" : "The organizers are confirming the booking now, so watch your group chat for the details."}</p>
   </div></div>`;
 }
 function renderRsvp() {
@@ -1921,7 +2018,7 @@ function renderRsvp() {
   $$(".rsvp-b").forEach(b => b.setAttribute("aria-pressed", String((b.dataset.go === "1") === go)));
   const h = $("#rsvpHint");
   if (go) h.textContent = "";
-  else if (S.draft.going == null && prev) h.textContent = "Your vote didn't include this night. If you can make it after all, tap I'll be there and save.";
+  else if (S.draft.going == null && prev) h.textContent = "Your vote didn't include this night, but we'd love to have you. If you can make it after all, tap I'll be there and save.";
   else h.textContent = "Got it, we'll miss you. Tap I'll be there if your plans change.";
 }
 function renderShareCard() {
@@ -1964,6 +2061,39 @@ function pledgeTags(row) {
 }
 function openDlg(d) { if (d.showModal) d.showModal(); else d.setAttribute("open", ""); }
 function closeDlg(d) { if (d.close) d.close(); else d.removeAttribute("open"); }
+// After the vote: people whose vote missed the night get asked once per visit whether they can make it
+function maybeAskConfirm(v) {
+  if (!v || !closed() || !S.loaded || !stillToConfirm(v)) return;
+  try { if (sessionStorage.getItem("dtd_cf_" + v.name_key)) return; } catch (e) {}
+  if ($$("dialog[open]").length) return;
+  const L = leader(), dlg = $("#confirmDlg");
+  const voted = (v.dates || []).map(id => dateById(id).label);
+  $("#cfTitle").textContent = "Can you make it, " + v.name.split(" ")[0] + "?";
+  $("#cfBody").innerHTML = `The party landed on <b>${L.d.label}</b> (${esc(L.d.nights)})${L.v ? ` at <b>${esc(L.v.name)}</b>` : ""}. ` +
+    `You voted for <b>${esc(listJoin(voted))}</b>, so we're checking with you if you can make it after all (we surely hope you do!).`;
+  $("#cfErr").textContent = "";
+  const done = mark => { try { sessionStorage.setItem("dtd_cf_" + v.name_key, mark); } catch (e) {} };
+  const answer = async function (yes) {
+    $("#cfYes").disabled = $("#cfNo").disabled = true;
+    try {
+      await API.move(v.name_key, { going: yes });
+      v.going = yes;
+      const mine = voteByKey(v.name_key); if (mine) mine.going = yes;
+      if (S.draft.choir && voteKey(S.draft.name, S.draft.choir) === v.name_key) S.draft.going = yes;
+      done("answered"); closeDlg(dlg);
+      renderForm(); renderResults();
+      if (yes) { Sound.joy(); toast("You're in! See you on " + L.d.label + (L.v ? " at " + L.v.short : "") + "."); }
+      else { Sound.rest(); toast("Got it, we'll miss you. You can still leave a note on the hype board."); }
+    } catch (e) { $("#cfErr").textContent = "Couldn't save just now. Check your connection and try again."; }
+    finally { $("#cfYes").disabled = $("#cfNo").disabled = false; }
+  };
+  $("#cfYes").onclick = () => answer(true);
+  $("#cfNo").onclick = () => answer(false);
+  $("#cfLater").onclick = () => { done("later"); closeDlg(dlg); };
+  dlg.onclose = () => { try { if (!sessionStorage.getItem("dtd_cf_" + v.name_key)) sessionStorage.setItem("dtd_cf_" + v.name_key, "later"); } catch (e) {} };
+  openDlg(dlg); Sound.jingle(); $("#cfYes").focus();
+}
+
 // Same name already voted under another choir. true = it's them (move it), false = someone else, null = closed
 function askMove(old, toChoir) {
   return new Promise(function (resolve) {
@@ -2049,7 +2179,7 @@ function wire() {
       hint.textContent = "More than one " + same[0].name + " has voted. Pick your choir to load yours."; hint.className = "hint gold";
       updateSaveLabel(); return;
     }
-    if (v && v.name_key !== S.loadedKey && !S.touched) { loadVoteIntoDraft(v); hint.textContent = "Welcome back, " + v.name + ". Your saved answers are loaded, change anything you like."; hint.className = "hint gold"; }
+    if (v && v.name_key !== S.loadedKey && !S.touched) { loadVoteIntoDraft(v); setTimeout(() => maybeAskConfirm(v), 300); hint.textContent = "Welcome back, " + v.name + ". Your saved answers are loaded, change anything you like."; hint.className = "hint gold"; }
     else if (v && v.name_key !== S.loadedKey) { hint.textContent = "Someone named " + v.name + " from " + (choirById(v.choir) ? choirById(v.choir).name : "this choir") + " already voted. Saving will replace that vote."; hint.className = "hint gold"; }
     else if (!v) {
       const other = S.draft.choir ? same.filter(x => x.choir !== S.draft.choir).sort((a, b) => String(b.updated_at || "").localeCompare(String(a.updated_at || "")))[0] : null;
@@ -2195,14 +2325,7 @@ function wire() {
     setTimeout(() => $("#nameInput").focus({ preventScroll: true }), 350);
   });
 
-  $("#results").addEventListener("click", function (e) {
-    const p = e.target.closest("[data-playdate]"); if (p) { Sound.unlock(); playDate(p.dataset.playdate); return; }
-    const c = e.target.closest("[data-cadence]"); if (c) { Sound.unlock(); if (!Sound.on) { toast("Sound is off. Turn it on at the top right."); return; } playDate(c.dataset.cadence); setTimeout(() => Sound.cadence(), 1600); return; }
-    const n = e.target.closest(".note"); if (n) showTip(n);
-  });
-  $("#results").addEventListener("focusin", function (e) { const n = e.target.closest(".note"); if (n) showTip(n); });
-  $("#results").addEventListener("mouseover", function (e) { const n = e.target.closest(".note"); if (n) showTip(n); });
-  $("#results").addEventListener("mouseout", function (e) { if (e.target.closest(".note")) hideTips(); });
+  wireResults($("#results"));
 
   $("#lbClose").addEventListener("click", closeLB);
   $("#lbPrev").addEventListener("click", () => stepLB(-1));
@@ -2223,6 +2346,16 @@ function wire() {
   window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderScore, 200); });
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refresh(false); });
   setInterval(() => { if (document.visibilityState === "visible" && !S.saving) refresh(false); }, CONFIG.POLL_MS);
+}
+function wireResults(el) {
+  el.addEventListener("click", function (e) {
+    const p = e.target.closest("[data-playdate]"); if (p) { Sound.unlock(); playDate(p.dataset.playdate); return; }
+    const c = e.target.closest("[data-cadence]"); if (c) { Sound.unlock(); if (!Sound.on) { toast("Sound is off. Turn it on at the top right."); return; } playDate(c.dataset.cadence); setTimeout(() => Sound.cadence(), 1600); return; }
+    const n = e.target.closest(".note"); if (n) showTip(n);
+  });
+  el.addEventListener("focusin", function (e) { const n = e.target.closest(".note"); if (n) showTip(n); });
+  el.addEventListener("mouseover", function (e) { const n = e.target.closest(".note"); if (n) showTip(n); });
+  el.addEventListener("mouseout", function (e) { if (e.target.closest(".note")) hideTips(); });
 }
 function showTip(n) {
   hideTips();
