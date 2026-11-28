@@ -98,7 +98,9 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 @media (max-width:600px){.cd-l{display:none}.cd-s{display:inline}.cd-time{display:block}}
 /* after the vote: one card for the date and place, plus "are you coming?" */
 .pcard{background:var(--night-2);border:1.5px solid var(--gold);border-radius:18px;overflow:hidden}
-.pcard img{display:block;width:100%;aspect-ratio:16/9;max-height:300px;object-fit:cover;background:var(--night-3)}
+.pcard .slide{aspect-ratio:16/9;max-height:340px}
+.pcard .slide img{display:block}
+.pcard .credit{margin-top:10px}
 .pc-body{padding:16px 18px 18px}
 .pc-when{margin:0;font:400 clamp(1.9rem,6.5vw,2.4rem)/1.05 var(--serif)}
 .pc-nights{margin:4px 0 12px;color:var(--capiz-2)}
@@ -558,7 +560,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       </div>
       <div class="field">
         <label for="nameInput">Your name, the way the choir knows you</label>
-        <input class="input" id="nameInput" type="text" maxlength="40" autocomplete="nickname" autocapitalize="words" placeholder="e.g. MJ" enterkeyhint="next">
+        <input class="input" id="nameInput" type="text" maxlength="40" autocomplete="nickname" autocapitalize="words" placeholder="e.g. Marnehlicious" enterkeyhint="next">
         <p class="hint" id="nameHint" aria-live="polite"></p>
       </div>
       <p class="flabel" id="choirLbl">Your choir</p>
@@ -1308,12 +1310,22 @@ function renderDates() {
   });
   $("#restBtn").setAttribute("aria-pressed", String(S.draft.none));
 }
+// Swipeable photo strip (arrows on computers, dots for the count); tap a photo to open it big
+function carouselHTML(v) {
+  const slides = v.photos.map((p, i) =>
+    `<figure class="slide" data-v="${v.id}" data-i="${i}"><img loading="${i === 0 ? "eager" : "lazy"}" decoding="async" src="${esc(p.src)}" ${p.alt ? `data-alt="${esc(p.alt)}"` : ""} alt="${esc(v.name + ": " + p.cap)}" referrerpolicy="no-referrer"><figcaption>${esc(p.cap)}</figcaption></figure>`).join("");
+  const more = v.photos.length > 1;
+  return `<div class="carousel">
+      <div class="track" tabindex="0" aria-label="${esc(v.name)} photos">${slides}</div>
+      ${more ? `<button class="car-btn prev" type="button" aria-label="Previous photo">&lsaquo;</button>
+      <button class="car-btn next" type="button" aria-label="Next photo">&rsaquo;</button>
+      <div class="dots" aria-hidden="true">${v.photos.map((p, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
+    </div>`;
+}
 function renderVenues() {
   const box = $("#venues");
   if (!box.dataset.built) {
     box.innerHTML = VENUES.map(function (v) {
-      const slides = v.photos.map((p, i) =>
-        `<figure class="slide" data-v="${v.id}" data-i="${i}"><img loading="${i === 0 ? "eager" : "lazy"}" decoding="async" src="${esc(p.src)}" ${p.alt ? `data-alt="${esc(p.alt)}"` : ""} alt="${esc(v.name + ": " + p.cap)}" referrerpolicy="no-referrer"><figcaption>${esc(p.cap)}</figcaption></figure>`).join("");
       const av = DATES.map(function (d) {
         const a = v.avail[d.id];
         const cls = a === true ? "ok" : a === false ? "no" : "ask";
@@ -1326,12 +1338,7 @@ function renderVenues() {
       const quip = v.quip ? `<p class="quip">\u201c${esc(v.quip.text)}\u201d<span class="by">${esc(v.quip.by)}</span></p>` : "";
       const links = v.links.map(l => `<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("");
       return `<article class="venue" id="venue-${v.id}" data-venue="${v.id}">
-        <div class="carousel">
-          <div class="track" tabindex="0" aria-label="${esc(v.name)} photos">${slides}</div>
-          <button class="car-btn prev" type="button" aria-label="Previous photo">&lsaquo;</button>
-          <button class="car-btn next" type="button" aria-label="Next photo">&rsaquo;</button>
-          <div class="dots" aria-hidden="true">${v.photos.map((p, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>
-        </div>
+        ${carouselHTML(v)}
         <div class="venue-body">
           <div class="vtop"><div><h3>${esc(v.name)}</h3><p class="kind">${esc(v.kind)}</p></div>
             <span class="status ${v.status === "ok" ? "ok" : "ask"}">${v.status === "ok" ? "Rates in" : "Still asking"}</span></div>
@@ -1395,19 +1402,19 @@ function renderVoterChips() {
 /* ================================================================
    Carousels + lightbox
    ================================================================ */
-function wireCarousels() {
-  $$(".carousel").forEach(function (car) {
-    const track = $(".track", car), dots = $$(".dots i", car);
-    const idx = () => Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
-    track.addEventListener("scroll", function () { const i = idx(); dots.forEach((d, j) => d.classList.toggle("on", i === j)); }, { passive: true });
+function wireCarousel(car) {
+  const track = $(".track", car), dots = $$(".dots i", car);
+  const idx = () => Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+  track.addEventListener("scroll", function () { const i = idx(); dots.forEach((d, j) => d.classList.toggle("on", i === j)); }, { passive: true });
+  if ($(".prev", car)) {
     $(".prev", car).addEventListener("click", () => track.scrollBy({ left: -track.clientWidth, behavior: "smooth" }));
     $(".next", car).addEventListener("click", () => track.scrollBy({ left: track.clientWidth, behavior: "smooth" }));
-    track.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowRight") { e.preventDefault(); track.scrollBy({ left: track.clientWidth, behavior: "smooth" }); }
-      if (e.key === "ArrowLeft") { e.preventDefault(); track.scrollBy({ left: -track.clientWidth, behavior: "smooth" }); }
-    });
+  }
+  track.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") { e.preventDefault(); track.scrollBy({ left: track.clientWidth, behavior: "smooth" }); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); track.scrollBy({ left: -track.clientWidth, behavior: "smooth" }); }
   });
-  $$(".slide img").forEach(function (img) {
+  $$(".slide img", car).forEach(function (img) {
     img.addEventListener("error", function () {
       if (img.dataset.alt && !img.dataset.tried) { img.dataset.tried = "1"; img.src = img.dataset.alt; return; }
       const fig = img.closest(".slide");
@@ -1416,11 +1423,12 @@ function wireCarousels() {
       fig.innerHTML = `<p>This photo didn't load. See more on the ${esc(v.links[0].label.toLowerCase())}.</p>`;
     });
   });
-  $("#venues").addEventListener("click", function (e) {
+  car.addEventListener("click", function (e) {
     const fig = e.target.closest(".slide");
     if (fig && !fig.classList.contains("broken")) openLB(fig.dataset.v, +fig.dataset.i);
   });
 }
+function wireCarousels() { $$("#venues .carousel").forEach(wireCarousel); }
 const LB = { v: null, i: 0 };
 function openLB(vid, i) {
   LB.v = venueById(vid); LB.i = i; showLB();
@@ -2002,15 +2010,16 @@ function renderParty() {
   $("#partyLede").textContent = L && L.official ? "It's official! Signing up means you're joining us on this night." : "The date is set! Signing up means you're joining us on this night.";
   if (!L) { $("#party").innerHTML = `<div class="pcard"><div class="pc-body"><p class="pc-where">Coming soon</p><p class="pc-kind">The organizers will post the date and place here. You can still sign up below.</p></div></div>`; return; }
   const v = L.v;
-  const photo = v && v.photos && v.photos[0] ? `<img src="${esc(v.photos[0].src)}" alt="${esc(v.name + ": " + v.photos[0].cap)}" referrerpolicy="no-referrer" loading="lazy">` : "";
+  const photo = v && v.photos && v.photos.length ? carouselHTML(v) : "";
   const rates = v && v.rates && v.rates.length ? `<ul class="pc-rates">${v.rates.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : "";
   const links = v && v.links ? `<div class="vlinks">${v.links.map(l => `<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}</div>` : "";
   $("#party").innerHTML = `<div class="pcard">${photo}<div class="pc-body">
     <p class="pc-when">${L.d.label}</p><p class="pc-nights">${esc(L.d.nights)}, overnight</p>
     <p class="pc-where">${v ? esc(v.name) : "Venue to be announced"}</p>${v && v.kind ? `<p class="pc-kind">${esc(v.kind)}</p>` : ""}
-    ${rates}${links}
+    ${rates}${links}${v && v.credit ? `<p class="credit">${esc(v.credit)}</p>` : ""}
     <p class="pc-status">${L.official ? "It's official. See you there!" : "The organizers are confirming the booking now, so watch your group chat for the details."}</p>
   </div></div>`;
+  const car = $("#party .carousel"); if (car) wireCarousel(car);
 }
 function renderRsvp() {
   if (!closed()) return;
