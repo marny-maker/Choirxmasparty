@@ -19,7 +19,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310173A'/%3E%3Cellipse cx='25' cy='45' rx='10' ry='7.5' transform='rotate(-22 25 45)' fill='%23F4B740'/%3E%3Cpath d='M33.5 43V12c6 3 13 6 13 15' stroke='%23F4B740' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IM+Fell+English:ital@0;1&family=Noto+Music&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IM+Fell+English:ital@0;1&family=Noto+Music&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --night:#10173A; --night-2:#18214D; --night-3:#222C61;
@@ -399,6 +399,26 @@ dialog.modal::backdrop{background:rgba(6,9,26,.78)}
 .setlist li span{color:var(--capiz-2);font-size:14.5px}
 /* dress code row */
 .dress{padding:64px 0 48px;border-top:1px solid var(--line)}
+/* Notes for the organizers: a sheet of manuscript paper with sticky notes, each tinted by its writer's voice part */
+.board{padding:64px 0 72px;border-top:1px solid var(--line)}
+.board .lede{max-width:36em}
+.pad{margin-top:26px;border-radius:18px;padding:34px 18px 18px;background-color:#EFE7D6;
+  background-image:linear-gradient(to bottom,transparent 13px,rgba(25,20,46,.09) 13px 14px,transparent 14px 23px,rgba(25,20,46,.09) 23px 24px,transparent 24px 33px,rgba(25,20,46,.09) 33px 34px,transparent 34px 43px,rgba(25,20,46,.09) 43px 44px,transparent 44px 53px,rgba(25,20,46,.09) 53px 54px,transparent 54px);
+  background-size:100% 96px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+@media (min-width:700px){.pad{padding:40px 30px 22px}}
+.notes{list-style:none;margin:0;padding:0;columns:2 150px;column-gap:16px}
+@media (min-width:700px){.notes{columns:3 200px;column-gap:24px}}
+@media (min-width:1100px){.notes{columns:4 220px}}
+.notes li{break-inside:avoid;margin:0 0 26px}
+.sticky{position:relative;display:block;width:100%;text-align:left;border:0;margin:0;padding:24px 15px 14px;background:var(--sc);color:#2A2340;
+  border-radius:2px 2px 16px 2px;box-shadow:0 1px 1px rgba(0,0,0,.08),0 12px 18px -10px rgba(25,20,46,.55);
+  transform:rotate(var(--r));transition:transform .2s ease,box-shadow .2s ease;font:500 22px/1.15 "Caveat",cursive;cursor:pointer}
+.sticky::before{content:"";position:absolute;top:-10px;left:50%;width:62px;height:20px;margin-left:-31px;background:rgba(255,255,255,.6);box-shadow:0 1px 2px rgba(0,0,0,.1);transform:rotate(calc(var(--r) * -1.6))}
+.sticky:hover,.sticky:focus-visible{transform:rotate(0deg) scale(1.03);box-shadow:0 1px 1px rgba(0,0,0,.08),0 18px 26px -10px rgba(25,20,46,.6)}
+.sticky .msg{display:block;white-space:pre-line;overflow-wrap:anywhere}
+.sticky .who{display:flex;align-items:center;gap:7px;margin-top:12px;font:600 13.5px/1.25 var(--sans);color:#4A4360}
+.sticky .who b{flex:none;font:800 11px/1 var(--sans);color:#19142E;background:var(--c);border-radius:4px;padding:3px 5px}
+.sticky.empty{cursor:default}
 .dress-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
 .dress-head .lede{max-width:36em}
 .dress-nav{display:none;gap:8px;flex:0 0 auto}
@@ -442,6 +462,7 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
 
 @media (prefers-reduced-motion:reduce){
   .cd[data-s="coda"] .dyn,.ctally b.bump{animation:none}
+  .sticky{transition:none}
   *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   .fly{display:none}
 }
@@ -589,8 +610,9 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       <div class="stack">
         <div class="field"><label for="songInput">Request a song</label>
           <input class="input" id="songInput" type="text" maxlength="120" placeholder="Something to sing together or belt at the videoke"></div>
-        <div class="field"><label for="noteInput">Anything else the organizers should know?</label>
-          <textarea class="input" id="noteInput" maxlength="300" placeholder="Arriving late, food allergies, can bring a guitar..."></textarea></div>
+        <div class="field"><label for="noteInput">Notes for the organizers or hype board</label>
+          <textarea class="input" id="noteInput" maxlength="300" placeholder="Arriving late, food allergies, can bring a guitar..."></textarea>
+          <p class="hint">Your note gets pinned to the board at the bottom of the page, for everyone to see.</p></div>
       </div>
     </div>
   </section>
@@ -667,6 +689,14 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
       </div>
     </div>
     <div class="fits" id="fits" aria-label="Outfit ideas"></div>
+  </section>
+  <section class="board" id="notes" aria-labelledby="h-nb">
+    <div class="wrap wide">
+      <p class="tempo">Coda</p>
+      <h2 id="h-nb" style="font:400 clamp(2rem,6.6vw,2.5rem)/1.05 var(--serif);margin:0">Notes for the organizers or hype board</h2>
+      <p class="lede">Everything you've told us, pinned up for everyone to see. <span id="notesCount"></span> Tap a note to hear its writer's voice part, and add yours in step <span data-stepref="step-e">E</span>.</p>
+      <div class="pad"><ul class="notes" id="notesBoard"></ul></div>
+    </div>
   </section>
 </main>
 
@@ -1561,6 +1591,29 @@ function renderRoll() {
     ? `<ul>${c[1].slice().sort((x, y) => order(x) - order(y) || x.name.localeCompare(y.name)).map(v => rollRow(v, night)).join("")}</ul>`
     : `<p class="rc-empty">No one yet. Be the first!</p>`}</div>`).join("");
 }
+// Notes board: newest first, skipping "N/A"-style notes; each sticky is tinted by its writer's voice part
+const NOTE_TINT = { S: "#FFE08A", A: "#FFC3B8", T: "#BDEDE7", B: "#DAD2FF", X: "#FFF4D1" };
+const EMPTY_NOTE = /^(n\/?a|none|wala|nothing|no|nope|-+|\.+)$/i;
+function renderNotes() {
+  const box = $("#notesBoard");
+  const list = S.votes.filter(v => v.note && v.note.trim() && !EMPTY_NOTE.test(v.note.trim()))
+    .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
+  const sig = (S.loaded ? "1" : "0") + list.map(v => v.name_key + "|" + v.voice_part + "|" + v.note).join("\u0001");
+  if (box.dataset.sig === sig) return;
+  box.dataset.sig = sig;
+  $("#notesCount").textContent = list.length ? plural(list.length, "note", "notes") + " so far." : "";
+  if (!list.length) {
+    box.innerHTML = `<li><div class="sticky empty" style="--sc:${NOTE_TINT.X};--r:-1.5deg"><span class="msg">${S.loaded ? "No notes yet. Leave the first one!" : "Loading notes..."}</span></div></li>`;
+    return;
+  }
+  const tilt = [-2.2, 1.6, -1, 2.4, -1.8, 0.9, 1.9, -2.6];
+  box.innerHTML = list.map(function (v, i) {
+    const p = PARTS[v.voice_part] ? v.voice_part : "X", c = choirById(v.choir);
+    return `<li><button type="button" class="sticky" data-part="${p}" style="--sc:${NOTE_TINT[p]};--r:${tilt[i % tilt.length]}deg">` +
+      `<span class="msg">${esc(v.note.trim())}</span>` +
+      `<span class="who"><b style="--c:${PARTS[p].css}" title="${PARTS[p].name}">${p === "X" ? "\u266A" : p}</b>${esc(v.name)}${c ? ", " + esc(c.short) : ""}</span></button></li>`;
+  }).join("");
+}
 function renderSetlist() {
   const songs = S.votes.filter(v => v.song_request && v.song_request.trim());
   $("#setlist").innerHTML = songs.length ? songs.map(v => `<li>${esc(v.song_request)} <span>for ${esc(v.name)}${choirById(v.choir) ? " (" + choirById(v.choir).short + ")" : ""}</span></li>`).join("") : `<li style="list-style:none;margin-left:-1.4em;color:var(--capiz-2)">No requests yet. Add one in step ${stepL("step-e")}.</li>`;
@@ -1569,7 +1622,7 @@ function renderLegend() {
   $("#legend").innerHTML = PART_ORDER.map(k => `<span style="--c:${PARTS[k].css}"><i></i>${PARTS[k].name}</span>`).join("");
 }
 function renderResults() {
-  renderSummary(); renderBest(); renderScore(); renderTally(); renderRoll(); renderSetlist();
+  renderSummary(); renderBest(); renderScore(); renderTally(); renderRoll(); renderSetlist(); renderNotes();
   renderCall(); renderShareCard(); renderCountdown();
 }
 
@@ -2121,6 +2174,10 @@ function wire() {
     const choir = S.draft.choir;
     loadVoteIntoDraft(old); S.draft.choir = choir; S.moveFrom = old.name_key; S.loadedKey = ""; S.touched = true;
     saveDraft(); renderForm(); matchVoter(); Sound.tick();
+  });
+  $("#notesBoard").addEventListener("click", function (e) {
+    const b = e.target.closest(".sticky[data-part]"); if (!b) return;
+    Sound.unlock(); Sound.pipe(PARTS[b.dataset.part].pipe);   // each note sings in its writer's voice part
   });
   $("#switchBtn").addEventListener("click", function () {
     S.moveFrom = ""; S.meKey = ""; store.del("dtd_me"); S.draft = blankDraft(); S.loadedKey = ""; S.touched = false; saveDraft();
