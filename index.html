@@ -1910,7 +1910,7 @@ function renderCall() {
   box.innerHTML = `${head}
     <p class="call-k" style="margin-top:4px">Coming so far</p>${tally}
     <p class="headcount">${headLine(counted)}</p>
-    <div class="tbc"><p class="call-k">Still to confirm</p><p class="tbc-line"><b>${S.loaded ? tbc.length : "&ndash;"}</b><span>${tbc.length ? (tbc.length === 1 ? "member voted for another night and hasn't said yet." : "members voted for another night and haven't said yet.") : "Everyone has confirmed. Nice!"}</span></p></div>
+    <div class="tbc"><p class="call-k">Still to confirm</p><p class="tbc-line"><b>${S.loaded ? tbc.length : "&ndash;"}</b><span>${tbc.length ? (tbc.length === 1 ? "member picked a different night. Fingers crossed they can still make it!" : "members picked a different night. Fingers crossed they can still make it!") : "Everyone has confirmed. Nice!"}</span></p></div>
     <div class="call-row"><p>${iVoted() ? "You're on the list. See you there!" : "Not on the list yet? Sign-ups stay open until the party."}</p>${iVoted() ? rollBtn : `<button class="btn btn-gold btn-sm" type="button" data-signup>Sign up</button>`}</div>`;
 }
 function headLine(list) {
