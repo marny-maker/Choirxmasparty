@@ -181,6 +181,7 @@ textarea.input{font-size:17px;min-height:88px;resize:vertical;line-height:1.45}
 .choir{background:var(--night-2);border:1.5px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center;font:400 19px/1.15 var(--serif);transition:background-color .15s,border-color .15s,transform .1s}
 .choir:hover{border-color:var(--line-2)}
 .choir[aria-checked="true"]{background:var(--capiz);border-color:var(--capiz);color:#19142E}
+.hint .linkbtn{font:inherit;font-weight:700;white-space:normal}
 .choir:active{transform:scale(.97)}
 .chipgroup{margin-top:12px}
 .chipgroup h4{margin:0 0 7px;font:italic 400 17px/1 var(--serif);color:var(--capiz)}
@@ -693,6 +694,14 @@ dialog.lb::backdrop{background:rgba(6,9,26,.94)}
     <div class="modal-actions"><button class="btn" id="pdNo" type="button">Let me think</button><button class="btn btn-gold" id="pdYes" type="button">Yes, count me in!</button></div>
   </div>
 </dialog>
+<dialog class="modal" id="moveDlg" aria-labelledby="mvTitle">
+  <div class="modal-in">
+    <p class="tempo">Modulation</p>
+    <h3 id="mvTitle">Is this you?</h3>
+    <p id="mvBody"></p>
+    <div class="modal-actions"><button class="btn" id="mvNo" type="button">No, that's someone else</button><button class="btn btn-gold" id="mvYes" type="button">Yes, move my vote</button></div>
+  </div>
+</dialog>
 <dialog class="modal" id="thanksDlg" aria-labelledby="tdTitle">
   <div class="modal-in">
     <p class="tempo">Fortissimo</p>
@@ -1060,7 +1069,24 @@ const API = (function () {
     });
     if (!r.ok) await fail(r);
   }
-  return { list: list, save: save, demo: demo };
+  // Move a vote to another choir: rewrite the old row in place, so the person shows up once
+  async function move(oldKey, row) {
+    if (demo) {
+      const all = JSON.parse(store.get("dtd_demo_votes", "[]"));
+      const i = all.findIndex(v => v.name_key === oldKey);
+      if (i < 0) return save(row);
+      all[i] = Object.assign({}, all[i], row, { updated_at: new Date().toISOString() });
+      store.set("dtd_demo_votes", JSON.stringify(all));
+      return;
+    }
+    const r = await fetch(base + "?name_key=eq." + encodeURIComponent(oldKey), {
+      method: "PATCH",
+      headers: Object.assign({ "Content-Type": "application/json", Prefer: "return=minimal" }, headers),
+      body: JSON.stringify(row)
+    });
+    if (!r.ok) await fail(r);
+  }
+  return { list: list, save: save, move: move, demo: demo };
 })();
 
 /* ================================================================
@@ -1071,7 +1097,7 @@ const S = {
   votes: [], loaded: false, error: null,
   draft: (function () { try { return Object.assign(blankDraft(), JSON.parse(store.get("dtd_draft", "{}"))); } catch (e) { return blankDraft(); } })(),
   meKey: store.get("dtd_me", ""),
-  loadedKey: "", touched: false, seen: null, saving: false
+  loadedKey: "", touched: false, seen: null, saving: false, moveFrom: ""
 };
 const saveDraft = () => store.set("dtd_draft", JSON.stringify(S.draft));
 const voteByKey = k => S.votes.find(v => v.name_key === k);
@@ -1618,18 +1644,29 @@ async function save() {
   const d = S.draft;
   let name = normName(d.name);
   const prev = voteByKey(voteKey(name, d.choir));
+  let src = prev;   // the vote being updated: this choir's, or the one moving over from another choir
+  if (!prev) {
+    const elsewhere = S.votes.filter(x => nameLower(x.name) === nameLower(name) && x.choir !== d.choir)
+      .sort((a, b) => String(b.updated_at || "").localeCompare(String(a.updated_at || "")))[0];
+    if (elsewhere) {
+      let mine = elsewhere.name_key === S.meKey || elsewhere.name_key === S.moveFrom;
+      if (!mine) { const ans = await askMove(elsewhere, d.choir); if (ans === null) return; mine = ans; }
+      if (mine) src = elsewhere;
+    }
+  }
+  const moving = src && src !== prev ? src : null;
   // typing "ana" to edit shouldn't turn "Ana" into "ana"
-  if (prev && name === name.toLowerCase() && prev.name !== prev.name.toLowerCase()) name = prev.name;
+  if (src && name === name.toLowerCase() && src.name !== src.name.toLowerCase()) name = src.name;
   const row = {
     name: name, name_key: voteKey(name, d.choir), choir: d.choir, voice_part: d.part,
     dates: d.none ? [] : DATES.map(x => x.id).filter(id => d.dates.includes(id)),
     cant_make_it: !!d.none,
     venues: VENUES.map(v => v.id).filter(id => d.venues.includes(id)),
     ...(closed() ? {   // the vote is over: keep nights and venues exactly as they were, so the result can't shift
-      dates: prev ? (prev.dates || []) : [], cant_make_it: prev ? !!prev.cant_make_it : false,
-      venues: prev ? (prev.venues || []) : [],
+      dates: src ? (src.dates || []) : [], cant_make_it: src ? !!src.cant_make_it : false,
+      venues: src ? (src.venues || []) : [],
       // store only a real answer (or "yes" for a brand-new sign-up); otherwise their vote keeps deciding
-      going: S.draft.going != null ? S.draft.going : prev ? (prev.going == null ? null : prev.going) : true
+      going: S.draft.going != null ? S.draft.going : src ? (src.going == null ? null : src.going) : true
     } : {}),
     guests_adults: d.adults, guests_kids: d.kids,
     song_request: d.song.trim() || null, note: d.note.trim() || null,
@@ -1638,16 +1675,18 @@ async function save() {
     pledge_food: d.foodOn ? (d.food.trim() || null) : null
   };
   const sig = o => (o.pledge_method || "") + "|" + (o.pledge_food || "");
-  const newPledge = (row.pledge_method || row.pledge_food) && sig(row) !== (prev ? sig(prev) : "|");
+  const newPledge = (row.pledge_method || row.pledge_food) && sig(row) !== (src ? sig(src) : "|");
   if (newPledge && !(await askPledge(row))) { toast("No worries. Nothing's saved yet, take your time."); return; }
   S.saving = true; const btn = $("#saveBtn"); btn.disabled = true; btn.textContent = "Saving...";
   try {
-    await API.save(row);
+    if (moving) await API.move(moving.name_key, row); else await API.save(row);
+    S.moveFrom = "";
     S.meKey = row.name_key; store.set("dtd_me", row.name_key); S.loadedKey = row.name_key; S.touched = false;
     Sound.joy(); flyNotes(btn);
     await refresh(false);
     if (newPledge) { showThanks(row); return; }
-    toast(closed() ? (isComing(row) ? "You're signed up. See you at the party!" : "Saved. We'll miss you!") : row.cant_make_it ? "Vote saved. We'll miss you!" : "Vote saved. See where everyone stands below.");
+    toast(moving ? "Moved your vote from " + (choirById(moving.choir) || { name: "no choir" }).name + " to " + choirById(row.choir).name + ". You'll show up once in the roll call."
+      : closed() ? (isComing(row) ? "You're signed up. See you at the party!" : "Saved. We'll miss you!") : row.cant_make_it ? "Vote saved. We'll miss you!" : "Vote saved. See where everyone stands below.");
     clearTimeout(S.scrollT);   // show the results, unless the person starts doing something else first
     S.scrollT = setTimeout(() => { S.scrollT = 0; $("#results").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }); }, 1100);
   } catch (e) {
@@ -1863,6 +1902,21 @@ function pledgeTags(row) {
 }
 function openDlg(d) { if (d.showModal) d.showModal(); else d.setAttribute("open", ""); }
 function closeDlg(d) { if (d.close) d.close(); else d.removeAttribute("open"); }
+// Same name already voted under another choir. true = it's them (move it), false = someone else, null = closed
+function askMove(old, toChoir) {
+  return new Promise(function (resolve) {
+    const dlg = $("#moveDlg"), from = choirById(old.choir), to = choirById(toChoir);
+    $("#mvBody").innerHTML = `There's already a vote from <b>${esc(old.name)}</b> under <b>${esc(from ? from.name : "no choir")}</b>. If it's yours, we'll move it to <b>${esc(to.name)}</b>, so you only show up once in the roll call.`;
+    let done = false;
+    const finish = ans => { if (done) return; done = true; closeDlg(dlg); dlg.removeEventListener("close", onClose); resolve(ans); };
+    const onClose = () => finish(null);
+    $("#mvYes").onclick = () => finish(true);
+    $("#mvNo").onclick = () => finish(false);
+    dlg.addEventListener("close", onClose);
+    $("#toast").classList.remove("show");
+    openDlg(dlg); Sound.tick(); $("#mvYes").focus();
+  });
+}
 function askPledge(row) {
   return new Promise(function (resolve) {
     const dlg = $("#pledgeDlg");
@@ -1927,6 +1981,7 @@ function wire() {
   function matchVoter() {
     const nl = nameLower(nameIn.value), hint = $("#nameHint");
     const same = nl ? S.votes.filter(x => nameLower(x.name) === nl) : [];
+    if (S.moveFrom && !same.some(x => x.name_key === S.moveFrom)) S.moveFrom = "";   // name changed: nothing to move
     let v = S.draft.choir ? same.find(x => x.choir === S.draft.choir) : (same.length === 1 ? same[0] : null);
     if (!S.draft.choir && same.length > 1) {
       hint.textContent = "More than one " + same[0].name + " has voted. Pick your choir to load yours."; hint.className = "hint gold";
@@ -1934,7 +1989,18 @@ function wire() {
     }
     if (v && v.name_key !== S.loadedKey && !S.touched) { loadVoteIntoDraft(v); hint.textContent = "Welcome back, " + v.name + ". Your saved answers are loaded, change anything you like."; hint.className = "hint gold"; }
     else if (v && v.name_key !== S.loadedKey) { hint.textContent = "Someone named " + v.name + " from " + (choirById(v.choir) ? choirById(v.choir).name : "this choir") + " already voted. Saving will replace that vote."; hint.className = "hint gold"; }
-    else if (!v) { hint.textContent = ""; hint.className = "hint"; if (S.loadedKey) S.loadedKey = ""; }
+    else if (!v) {
+      const other = S.draft.choir ? same.filter(x => x.choir !== S.draft.choir).sort((a, b) => String(b.updated_at || "").localeCompare(String(a.updated_at || "")))[0] : null;
+      const toName = S.draft.choir && choirById(S.draft.choir) ? choirById(S.draft.choir).name : "";
+      const fromName = other ? (choirById(other.choir) ? choirById(other.choir).name : "no choir") : "";
+      if (other && (S.moveFrom === other.name_key || S.meKey === other.name_key)) {
+        hint.textContent = "Moving your vote from " + fromName + " to " + toName + ". Save to make it official."; hint.className = "hint gold";
+      } else if (other) {
+        hint.innerHTML = `There's already a vote from ${esc(other.name)} under ${esc(fromName)}. If that's you, saving here moves it, so you only show up once. <button type="button" class="linkbtn" data-bring="${esc(other.name_key)}">Bring my answers over</button>`;
+        hint.className = "hint gold";
+      } else { hint.textContent = ""; hint.className = "hint"; }
+      if (S.loadedKey) S.loadedKey = "";
+    }
     updateSaveLabel();
   }
   $("#choirs").addEventListener("click", function (e) {
@@ -1956,7 +2022,9 @@ function wire() {
   function onChoirChange() {
     // answers loaded for a same-named person in another choir aren't this person's: clear them
     const loaded = S.loadedKey && voteByKey(S.loadedKey);
-    if (loaded && loaded.choir !== S.draft.choir && !S.touched) {
+    if (loaded && loaded.choir !== S.draft.choir && loaded.name_key === S.meKey) {
+      S.moveFrom = loaded.name_key;   // it's you switching choirs: keep your answers, move the vote on save
+    } else if (loaded && loaded.choir !== S.draft.choir && !S.touched) {
       S.draft = Object.assign(blankDraft(), { name: S.draft.name, choir: S.draft.choir });
       S.loadedKey = ""; saveDraft(); renderForm();
     }
@@ -2047,8 +2115,15 @@ function wire() {
   $("#noteInput").addEventListener("input", function () { S.draft.note = this.value; S.touched = true; saveDraft(); });
   $("#saveBtn").addEventListener("click", save);
 
+  $("#nameHint").addEventListener("click", function (e) {
+    const b = e.target.closest("[data-bring]"); if (!b) return;
+    const old = voteByKey(b.dataset.bring); if (!old) return;
+    const choir = S.draft.choir;
+    loadVoteIntoDraft(old); S.draft.choir = choir; S.moveFrom = old.name_key; S.loadedKey = ""; S.touched = true;
+    saveDraft(); renderForm(); matchVoter(); Sound.tick();
+  });
   $("#switchBtn").addEventListener("click", function () {
-    S.meKey = ""; store.del("dtd_me"); S.draft = blankDraft(); S.loadedKey = ""; S.touched = false; saveDraft();
+    S.moveFrom = ""; S.meKey = ""; store.del("dtd_me"); S.draft = blankDraft(); S.loadedKey = ""; S.touched = false; saveDraft();
     $("#nameHint").textContent = ""; renderForm(); renderScore();
     $("#step-a").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
     setTimeout(() => $("#nameInput").focus({ preventScroll: true }), 350);
