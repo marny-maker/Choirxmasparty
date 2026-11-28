@@ -430,6 +430,13 @@ dialog.modal::backdrop{background:rgba(6,9,26,.78)}
 .fit:hover{border-color:var(--line-2)}
 .fit.say{border-color:var(--gold)}
 .fit-art{display:block;padding-top:30px}
+/* the TikTok card: same size as the outfit cards, video where the drawing would be */
+.fit.vid{cursor:default;border-color:var(--gold)}
+.vid-frame{position:relative;width:100%;aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:#000}
+.vid-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vid-frame a{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:14px;color:var(--capiz);font-weight:600}
+.vid-by{font-size:13px;color:var(--capiz-3)}
+.vid-by a{color:var(--capiz-2)}
 .fit-art svg{display:block;width:100%;height:auto;transform-origin:50% 95%}
 .fit.wobble .fit-art svg{animation:wobble .65s ease-in-out}
 @keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-6deg)}45%{transform:rotate(5deg)}70%{transform:rotate(-3deg)}85%{transform:rotate(1.5deg)}}
@@ -758,6 +765,8 @@ const CONFIG = {
   FINAL_PICK: { date: "", venue: "" },
   SITE_URL: "https://choirxmasparty.vercel.app/",
   INVITE: "I'm in for the Choir Christmas Party this year! Votes close Saturday, vote na para ma-count ka.",
+  // First card in the dress-code row: a TikTok that plays (muted) while it's on screen. Blank id hides it.
+  DRESS_VIDEO: { id: "7589275012759047445", by: "@cmgocampo", url: "https://www.tiktok.com/@cmgocampo/video/7589275012759047445" },
   POLL_MS: 12000
 };
 
@@ -2400,8 +2409,18 @@ function fitArt(id) {
   return `<svg viewBox="0 0 160 200" role="img" aria-hidden="true">${s}</svg>`;
 }
 
+function videoCard() {
+  const v = CONFIG.DRESS_VIDEO;
+  if (!v || !v.id) return "";
+  return `<div class="fit vid" data-video>
+      <div class="vid-frame" id="vidFrame"><a href="${esc(v.url)}" target="_blank" rel="noopener">Loading the video...</a></div>
+      <span class="fit-name">Exhibit A</span>
+      <span class="fit-where"><b>The energy we want:</b> a whole squad committing to one off-key look.</span>
+      <span class="vid-by">Video: <a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.by)} on TikTok</a></span>
+    </div>`;
+}
 function renderFits() {
-  $("#fits").innerHTML = FITS.map(f => `<button type="button" class="fit" data-fit="${f.id}" aria-label="${esc(f.name + ". Belongs at: " + f.where + ". Says: " + f.say)}">
+  $("#fits").innerHTML = videoCard() + FITS.map(f => `<button type="button" class="fit" data-fit="${f.id}" aria-label="${esc(f.name + ". Belongs at: " + f.where + ". Says: " + f.say)}">
       <span class="bubble" aria-hidden="true">${esc(f.say)}</span>
       <span class="fit-art" aria-hidden="true">${fitArt(f.id)}</span>
       <span class="fit-name" aria-hidden="true">${esc(f.name)}</span>
@@ -2411,7 +2430,7 @@ function renderFits() {
 function wireFits() {
   const row = $("#fits");
   row.addEventListener("click", function (e) {
-    const card = e.target.closest(".fit"); if (!card) return;
+    const card = e.target.closest(".fit"); if (!card || card.hasAttribute("data-video")) return;
     const was = card.classList.contains("say");
     $$(".fit.say", row).forEach(c => c.classList.remove("say"));
     if (!was) card.classList.add("say");
@@ -2419,9 +2438,40 @@ function wireFits() {
     setTimeout(() => card.classList.remove("wobble"), 700);
     Sound.unlock(); Sound.stonato();
   });
+  wireVideo();
   const step = () => Math.max(220, row.clientWidth * 0.8);
   $("#fitsPrev").addEventListener("click", () => row.scrollBy({ left: -step(), behavior: reduced() ? "auto" : "smooth" }));
   $("#fitsNext").addEventListener("click", () => row.scrollBy({ left: step(), behavior: reduced() ? "auto" : "smooth" }));
+}
+
+// TikTok embed player: loads as the outfits come near, plays (muted) only while at least half of it is on screen
+function wireVideo() {
+  const v = CONFIG.DRESS_VIDEO, box = $("#vidFrame");
+  if (!v || !v.id || !box) return;
+  let frame = null, ready = false, inView = false, wantPlay = !reduced();
+  const send = type => { if (frame && ready) frame.contentWindow.postMessage({ type: type, "x-tiktok-player": true }, "*"); };
+  const sync = () => send(inView && !document.hidden && wantPlay ? "play" : "pause");
+  function load() {
+    if (frame) return;
+    const q = "autoplay=" + (wantPlay ? 1 : 0) + "&loop=1&controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1&timestamp=0&description=0&music_info=0&rel=0";
+    frame = document.createElement("iframe");
+    frame.src = "https://www.tiktok.com/player/v1/" + encodeURIComponent(v.id) + "?" + q;
+    frame.title = "TikTok video by " + v.by + ": a squad in matching off-key outfits";
+    frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
+    box.innerHTML = ""; box.appendChild(frame);
+  }
+  window.addEventListener("message", function (e) {
+    if (!frame || e.source !== frame.contentWindow || !e.data || !e.data["x-tiktok-player"]) return;
+    if (e.data.type === "onPlayerReady") { ready = true; sync(); }
+    if (e.data.type === "onStateChange" && e.data.value === 1 && !inView) send("pause");   // never play off screen
+    if (e.data.type === "onPlayerError" && e.data.value && e.data.value.errorCode !== 3002) {
+      box.innerHTML = `<a href="${esc(v.url)}" target="_blank" rel="noopener">Watch it on TikTok</a>`; frame = null;
+    }
+  });
+  if (!("IntersectionObserver" in window)) { load(); inView = true; return; }
+  new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) load(); }, { rootMargin: "400px 400px" }).observe(box);
+  new IntersectionObserver(es => { inView = es[0].intersectionRatio >= 0.5; sync(); }, { threshold: [0, 0.5, 1] }).observe(box);
+  document.addEventListener("visibilitychange", sync);
 }
 
 /* ================================================================
